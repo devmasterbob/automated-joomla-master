@@ -1,9 +1,13 @@
 services:
   joomla:
+    build:
+      context: .
+      dockerfile: Dockerfile.joomla
     image: joomla
+    container_name: ${PROJECT_NAME}-joomla
     restart: always
     ports:
-      - 80:80
+      - ${PORT_JOOMLA}:80
     env_file:
       - .env
     volumes:
@@ -12,12 +16,35 @@ services:
       - joomla_network
 
   db:
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile.mysql
     image: mysql:8.0
+    container_name: ${PROJECT_NAME}-mysql
     restart: always
+    ports:
+      - ${PORT_MYSQL}:3306
     env_file:
       - .env
+    command: --default-authentication-plugin=mysql_native_password
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - joomla_network
+
+  phpmyadmin:
+    build:
+      context: ./phpmyadmin
+      dockerfile: Dockerfile.phpmyadmin
+    image: phpmyadmin:latest
+    container_name: ${PROJECT_NAME}-phpmyadmin
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "${PORT_PHPMYADMIN}:80"
+    restart: always
     networks:
       - joomla_network
 

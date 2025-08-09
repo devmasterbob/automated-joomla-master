@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: rgb(221, 221, 221);
+    background-color: #000000;
+    margin: 0;
+    padding: 30px;
+}
+
+h1 {
+
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: rgb(221, 221, 221);
+    margin-bottom: 20px;
+}
+
+ul {
+    background: #000000;
+    border-radius: 10px;
+    padding: 20px;
+    list-style-type: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+li {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+a {
+    color: rgb(0, 228, 216);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #2090d1;
+}
