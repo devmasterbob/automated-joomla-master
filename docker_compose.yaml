@@ -1,0 +1,31 @@
+services:
+
+  joomla:
+    image: joomla
+    restart: always
+    ports:
+      - 8080:80
+    env_file:
+      - .env
+    volumes:
+      - joomla_data:/var/www/html
+    networks:
+      - joomla_network
+
+  db:
+    image: mysql:8.0
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - joomla_network
+
+volumes:
+  joomla_data:
+  db_data:
+
+
+networks:
+  joomla_network:

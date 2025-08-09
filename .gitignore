@@ -1,0 +1,9 @@
+# .gitignore
+.env
+*.env
+!.env.example
+temp/
+joomladb.sql
+joomla/configuration.php
+joomla/
+_secrets/
