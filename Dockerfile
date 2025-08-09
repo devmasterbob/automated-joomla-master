@@ -4,10 +4,10 @@ FROM php:8.3-apache
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-    	ghostscript \
-    	zstd \
-    	gosu \
-    	default-mysql-client \
+    ghostscript \
+    zstd \
+    gosu \
+    default-mysql-client \
     ; \
     rm -rf /var/lib/apt/lists/*
 
@@ -16,38 +16,38 @@ RUN set -ex; \
     savedAptMark="$(apt-mark showmanual)"; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
-    	libbz2-dev \
-    	libgmp-dev \
-    	libjpeg-dev \
-    	libldap2-dev \
-    	libmcrypt-dev \
-    	libmemcached-dev \
-    	libpng-dev \
-    	libpq-dev \
-    	libzip-dev \
+    libbz2-dev \
+    libgmp-dev \
+    libjpeg-dev \
+    libldap2-dev \
+    libmcrypt-dev \
+    libmemcached-dev \
+    libpng-dev \
+    libpq-dev \
+    libzip-dev \
     ; \
     docker-php-ext-configure gd --with-jpeg; \
     docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu; \
     docker-php-ext-install -j "$(nproc)" \
-    	bz2 \
-    	gd \
-    	gmp \
-    	ldap \
-    	mysqli \
-    	pdo_mysql \
-    	pdo_pgsql \
-    	pgsql \
-    	zip \
+    bz2 \
+    gd \
+    gmp \
+    ldap \
+    mysqli \
+    pdo_mysql \
+    pdo_pgsql \
+    pgsql \
+    zip \
     ; \
     apt-mark auto '.*' > /dev/null; \
     apt-mark manual $savedAptMark; \
     ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-    	| awk '/=>/ { print $3 }' \
-    	| sort -u \
-    	| xargs -r dpkg-query -S \
-    	| cut -d: -f1 \
-    	| sort -u \
-    	| xargs -rt apt-mark manual; \
+    | awk '/=>/ { print $3 }' \
+    | sort -u \
+    | xargs -r dpkg-query -S \
+    | cut -d: -f1 \
+    | sort -u \
+    | xargs -rt apt-mark manual; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     rm -rf /var/lib/apt/lists/*
 
@@ -55,11 +55,11 @@ RUN set -ex; \
 RUN set -eux; \
     docker-php-ext-enable opcache; \
     { \
-    	echo 'opcache.memory_consumption=128'; \
-    	echo 'opcache.interned_strings_buffer=8'; \
-    	echo 'opcache.max_accelerated_files=4000'; \
-    	echo 'opcache.revalidate_freq=2'; \
-    	echo 'opcache.fast_shutdown=1'; \
+    echo 'opcache.memory_consumption=128'; \
+    echo 'opcache.interned_strings_buffer=8'; \
+    echo 'opcache.max_accelerated_files=4000'; \
+    echo 'opcache.revalidate_freq=2'; \
+    echo 'opcache.fast_shutdown=1'; \
     } > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 # Enable Apache modules
@@ -67,12 +67,12 @@ RUN set -eux; \
     a2enmod rewrite expires; \
     a2enmod remoteip; \
     { \
-    	echo 'RemoteIPHeader X-Forwarded-For'; \
-    	echo 'RemoteIPInternalProxy 10.0.0.0/8'; \
-    	echo 'RemoteIPInternalProxy 172.16.0.0/12'; \
-    	echo 'RemoteIPInternalProxy 192.168.0.0/16'; \
-    	echo 'RemoteIPInternalProxy 169.254.0.0/16'; \
-    	echo 'RemoteIPInternalProxy 127.0.0.0/8'; \
+    echo 'RemoteIPHeader X-Forwarded-For'; \
+    echo 'RemoteIPInternalProxy 10.0.0.0/8'; \
+    echo 'RemoteIPInternalProxy 172.16.0.0/12'; \
+    echo 'RemoteIPInternalProxy 192.168.0.0/16'; \
+    echo 'RemoteIPInternalProxy 169.254.0.0/16'; \
+    echo 'RemoteIPInternalProxy 127.0.0.0/8'; \
     } > /etc/apache2/conf-available/remoteip.conf; \
     a2enconf remoteip
 
