@@ -21,6 +21,18 @@ services:
     networks:
       - joomla_network
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "82:80"
+    networks:
+      - joomla_network
+
 volumes:
   db_data:
 
