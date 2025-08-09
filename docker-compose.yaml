@@ -1,14 +1,13 @@
 services:
-
   joomla:
     image: joomla
     restart: always
     ports:
-      - 8080:80
+      - 80:80
     env_file:
       - .env
     volumes:
-      - joomla_data:/var/www/html
+      - ./joomla:/var/www/html
     networks:
       - joomla_network
 
@@ -23,7 +22,6 @@ services:
       - joomla_network
 
 volumes:
-  joomla_data:
   db_data:
 
 
