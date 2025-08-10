@@ -1,6 +1,8 @@
 services:
   landing:
-    image: php:8.3-apache
+    build:
+      context: .
+      dockerfile: Dockerfile.landing
     container_name: ${PROJECT_NAME}-landing
     restart: always
     ports:
@@ -12,6 +14,8 @@ services:
       - ./CHAT_HISTORY.md:/var/www/CHAT_HISTORY.md:ro
     networks:
       - joomla_network
+    depends_on:
+      - db
 
   joomla:
     image: joomla:5-php8.3-apache

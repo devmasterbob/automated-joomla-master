@@ -3,6 +3,8 @@ $projectName = getenv('PROJECT_NAME');
 $joomlaDBUser = getenv('JOOMLA_DB_USER'); 
 $joomlaDBPw = getenv('JOOMLA_DB_PASSWORD');
 $joomlaAdmin = getenv('JOOMLA_ADMIN_USER');
+$portJoomla = getenv('PORT_JOOMLA') ?: '80';
+$portPhpMyAdmin = getenv('PORT_PHPMYADMIN') ?: '8082';
 if (!$projectName) {
     $projectName = 'Joomla Projekt';
 }
@@ -105,9 +107,9 @@ $joomlaDbName = getenv('JOOMLA_DB_NAME');
     <ul>
         <li><a href="test.php" target="_blank" rel="noopener noreferrer">PHP Info</a></li>
         <li><a href="db-test.php" target="_blank" rel="noopener noreferrer">Datenbank Test</a></li>
-        <li><a href="http://localhost:8881" target="_blank" rel="noopener noreferrer">Joomla Frontside</a></li>
-        <li><a href="http://localhost:8881/administrator" target="_blank" rel="noopener noreferrer">Joomla Administration</a></li>
-        <li><a href="http://localhost:8882" target="_blank" rel="noopener noreferrer">PHPMyAdmin</a></li>
+        <li><a href="http://localhost:<?php echo $portJoomla; ?>" target="_blank" rel="noopener noreferrer">Joomla Frontside</a></li>
+        <li><a href="http://localhost:<?php echo $portJoomla; ?>/administrator" target="_blank" rel="noopener noreferrer">Joomla Administration</a></li>
+        <li><a href="http://localhost:<?php echo $portPhpMyAdmin; ?>" target="_blank" rel="noopener noreferrer">PHPMyAdmin</a></li>
     </ul>
     <p>
     <ul>
