@@ -1,9 +1,9 @@
-# Database Export für Provider
-# Exportiert die Datenbank für den Upload zum Provider
+# Database Export for Provider
+# Exports the database for upload to hosting provider
 
-Write-Host "🗄️  Exportiere Datenbank..." -ForegroundColor Green
+Write-Host "🗄️  Exporting database..." -ForegroundColor Green
 
-# .env Datei laden
+# Load .env file
 if (Test-Path ".env") {
     Get-Content ".env" | ForEach-Object {
         if ($_ -match "^([^#][^=]+)=(.+)$") {
@@ -12,43 +12,42 @@ if (Test-Path ".env") {
     }
 }
 else {
-    Write-Host "❌ .env Datei nicht gefunden!" -ForegroundColor Red
+    Write-Host "❌ .env file not found!" -ForegroundColor Red
     exit 1
 }
 
 $projectName = [Environment]::GetEnvironmentVariable("PROJECT_NAME")
-$dbUser = [Environment]::GetEnvironmentVariable("MYSQL_USER")
 $dbPassword = [Environment]::GetEnvironmentVariable("MYSQL_ROOT_PASSWORD")
 $dbName = [Environment]::GetEnvironmentVariable("MYSQL_DATABASE")
 
 $date = Get-Date -Format "yyyy-MM-dd_HH-mm"
 $exportFile = "${projectName}_database_export_$date.sql"
 
-Write-Host "📋 Export-Details:" -ForegroundColor Cyan
-Write-Host "   Projekt: $projectName" -ForegroundColor White
-Write-Host "   Datenbank: $dbName" -ForegroundColor White
-Write-Host "   Datei: $exportFile" -ForegroundColor White
+Write-Host "📋 Export Details:" -ForegroundColor Cyan
+Write-Host "   Project: $projectName" -ForegroundColor White
+Write-Host "   Database: $dbName" -ForegroundColor White
+Write-Host "   File: $exportFile" -ForegroundColor White
 Write-Host ""
 
-# Docker Command für MySQL Dump
+# Docker Command for MySQL Dump
 $containerName = "$projectName-mysql"
-Write-Host "🔄 Führe Datenbank-Export aus..." -ForegroundColor Yellow
+Write-Host "🔄 Running database export..." -ForegroundColor Yellow
 
 docker exec $containerName mysqldump -u root -p$dbPassword $dbName > $exportFile
 
 if (Test-Path $exportFile) {
     $fileSize = [math]::Round((Get-Item $exportFile).Length / 1KB, 2)
-    Write-Host "✅ Datenbank exportiert: $exportFile ($fileSize KB)" -ForegroundColor Green
+    Write-Host "✅ Database exported: $exportFile ($fileSize KB)" -ForegroundColor Green
     Write-Host ""
-    Write-Host "📤 NÄCHSTE SCHRITTE FÜR PROVIDER-UPLOAD:" -ForegroundColor Cyan
-    Write-Host "1. Diese SQL-Datei zum Provider übertragen" -ForegroundColor White
-    Write-Host "2. Beim Provider phpMyAdmin öffnen" -ForegroundColor White
-    Write-Host "3. Datenbank auswählen/erstellen" -ForegroundColor White
-    Write-Host "4. 'Importieren' wählen und SQL-Datei hochladen" -ForegroundColor White
-    Write-Host "5. Joomla-Dateien aus 'joomla/' Ordner per FTP hochladen" -ForegroundColor White
-    Write-Host "6. configuration.php beim Provider anpassen" -ForegroundColor White
+    Write-Host "📤 NEXT STEPS FOR PROVIDER UPLOAD:" -ForegroundColor Cyan
+    Write-Host "1. Transfer this SQL file to your hosting provider" -ForegroundColor White
+    Write-Host "2. Open phpMyAdmin on your hosting provider" -ForegroundColor White
+    Write-Host "3. Select/create database" -ForegroundColor White
+    Write-Host "4. Choose 'Import' and upload the SQL file" -ForegroundColor White
+    Write-Host "5. Upload Joomla files from 'joomla/' folder via FTP" -ForegroundColor White
+    Write-Host "6. Adjust configuration.php with your provider's database settings" -ForegroundColor White
 }
 else {
-    Write-Host "❌ Export fehlgeschlagen!" -ForegroundColor Red
-    Write-Host "💡 Stelle sicher, dass die Container laufen: docker-compose ps" -ForegroundColor Yellow
+    Write-Host "❌ Export failed!" -ForegroundColor Red
+    Write-Host "💡 Make sure containers are running: docker-compose ps" -ForegroundColor Yellow
 }
