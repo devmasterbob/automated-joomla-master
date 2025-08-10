@@ -125,6 +125,7 @@ docker-compose up -d
 ├── .env                  # Ihre lokalen Einstellungen (wird erstellt)
 ├── README.md             # Diese Anleitung
 ├── CHAT_HISTORY.md       # Entwicklungsdokumentation
+├── export-database.ps1   # Provider-Export Skript
 ├── Dockerfile            # Custom Joomla Build (für Entwicklung)
 ├── docker-entrypoint.sh  # Automatisierungsskript
 ├── setup-joomla.sh       # Joomla Setup Automatisierung
@@ -161,6 +162,85 @@ Alle Joomla-Dateien befinden sich im `joomla/` Ordner und können direkt bearbei
 ### Datenbank-Zugriff
 - **Über phpMyAdmin:** http://localhost:82
 - **Direkt über MySQL:** `mysql -h localhost -P 3306 -u root -p`
+
+## 📤 Provider-Upload & Deployment
+
+### Datenbank exportieren
+```powershell
+# Im VS Code Terminal (PowerShell):
+.\export-database.ps1
+```
+
+**Das Skript:**
+- ✅ Liest automatisch die `.env` Konfiguration
+- ✅ Erstellt SQL-Datei: `projektname_database_export_2025-08-10_15-30.sql`
+- ✅ Zeigt detaillierte Upload-Anleitung
+
+### Kompletter Provider-Upload Workflow
+
+#### 1. 📋 Vorbereitung
+```bash
+# Stelle sicher, dass Container laufen:
+docker-compose ps
+
+# Exportiere die Datenbank:
+.\export-database.ps1
+```
+
+#### 2. 📁 Dateien sammeln
+**Benötigte Dateien:**
+- **Datenbank:** `projektname_database_export_DATUM.sql` (vom Skript erstellt)
+- **Joomla-Dateien:** Kompletter Inhalt des `joomla/` Ordners
+
+#### 3. 🌐 Beim Provider hochladen
+**Schritt A: FTP-Upload**
+```bash
+# Alle Dateien aus joomla/ ins Web-Verzeichnis des Providers
+# Beispiel-Struktur beim Provider:
+/public_html/
+├── index.php
+├── administrator/
+├── components/
+├── configuration.php  # ← Diese Datei anpassen!
+└── ...
+```
+
+**Schritt B: Datenbank importieren**
+1. Provider-phpMyAdmin öffnen
+2. Neue Datenbank erstellen (falls nötig)
+3. **Importieren** → SQL-Datei hochladen
+4. Import durchführen
+
+**Schritt C: Configuration.php anpassen**
+```php
+<?php
+class JConfig {
+    // Provider-Datenbankdaten eintragen:
+    public $host = 'provider-mysql-host';      // z.B. 'localhost' oder 'mysql.provider.com'
+    public $user = 'provider-db-username';     // Vom Provider erhalten
+    public $password = 'provider-db-password'; // Vom Provider erhalten
+    public $db = 'provider-db-name';          // Datenbankname beim Provider
+    
+    // Andere Einstellungen bleiben meist unverändert:
+    public $dbtype = 'mysqli';
+    public $dbprefix = 'joom_';
+    // ... rest bleibt gleich
+}
+```
+
+#### 4. ✅ Live-Test
+- Website unter Provider-Domain aufrufen
+- Frontend testen
+- Admin-Login testen: `/administrator`
+
+### 🔄 Regelmäßige Backups
+```powershell
+# Wöchentlichen Export für Backup:
+.\export-database.ps1
+
+# Zusätzlich Joomla-Dateien sichern:
+# Kopiere joomla/ Ordner an sicheren Ort
+```
 
 ## 🔒 Sicherheitshinweise
 
