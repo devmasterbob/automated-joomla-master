@@ -16,28 +16,45 @@ Eine vollständig automatisierte Docker-basierte Joomla CMS Entwicklungsumgebung
 
 | Branch | Beschreibung | Komponenten |
 |--------|--------------|-------------|
-| `automated-joomla-phpmyadmin` | **Erweiterte Version** (empfohlen) | Joomla + MySQL + phpMyAdmin + Vollautomatisierung |
+| **`main`** | **Hauptversion** (empfohlen) | Joomla + MySQL + phpMyAdmin + Vollautomatisierung |
 | `rollback-to-646a5ab` | **Einfache Version** | Joomla + MySQL (minimal) |
 
 ## 🚀 Schnellstart für neue Projekte
 
-### 1. Repository klonen
+### 1. Neues Projektverzeichnis erstellen & VS Code öffnen
 ```bash
-git clone https://github.com/devmasterbob/web-joomla-master-2508-09.git mein-neues-projekt
+# Neuen Ordner erstellen und VS Code öffnen
+mkdir mein-neues-projekt
 cd mein-neues-projekt
+code .
 ```
 
-### 2. Branch wählen
+### 2. Terminal in VS Code öffnen & Repository klonen
+- **Terminal** → **New Terminal** (oder `Strg+Shift+ö`)
+- Repository direkt ins aktuelle Verzeichnis klonen:
+
 ```bash
-# Für erweiterte Version (empfohlen):
-git checkout automated-joomla-phpmyadmin
+git clone https://github.com/devmasterbob/web-joomla-master-2508-09.git .
+```
+
+### 3. Branch wählen (optional)
+```bash
+# Hauptversion verwenden (Standard - bereits aktiv):
+# main Branch ist bereits geladen
 
 # Oder für einfache Version:
 git checkout rollback-to-646a5ab
 ```
 
-### 3. ⚠️ .env Datei anpassen
-**WICHTIG:** Bearbeiten Sie die `.env` Datei und ändern Sie mindestens:
+### 4. ⚠️ .env Datei anpassen
+**WICHTIG:** Kopieren Sie die `.env-example` zur `.env` und bearbeiten Sie sie:
+
+```bash
+# .env Datei aus Beispiel erstellen
+cp .env-example .env
+```
+
+Ändern Sie in der `.env` Datei mindestens:
 
 ```env
 # MUSS geändert werden - Name des Projektordners verwenden:
@@ -53,14 +70,15 @@ JOOMLA_ADMIN_EMAIL=admin@meinedomain.com
 JOOMLA_SITE_NAME=Mein Joomla Projekt
 ```
 
-### 4. System starten
+### 5. System starten
 ```bash
+# Im VS Code Terminal:
 docker-compose up -d
 ```
 
-### 5. ✅ Fertig!
+### 6. ✅ Fertig!
 - **Joomla:** http://localhost:80
-- **phpMyAdmin:** http://localhost:82 (nur erweiterte Version)
+- **phpMyAdmin:** http://localhost:82
 
 ## 🔧 Konfiguration
 
@@ -83,7 +101,10 @@ docker-compose up -d
 ```
 .
 ├── docker-compose.yaml    # Hauptkonfiguration
-├── .env                   # Alle Einstellungen hier!
+├── .env-example          # Vorlage für Konfiguration
+├── .env                  # Ihre lokalen Einstellungen (wird erstellt)
+├── README.md             # Diese Anleitung
+├── CHAT_HISTORY.md       # Entwicklungsdokumentation
 ├── Dockerfile            # Custom Joomla Build (für Entwicklung)
 ├── docker-entrypoint.sh  # Automatisierungsskript
 ├── setup-joomla.sh       # Joomla Setup Automatisierung
@@ -95,6 +116,8 @@ docker-compose up -d
 
 ### Container verwalten
 ```bash
+# Im VS Code Terminal:
+
 # Starten
 docker-compose up -d
 
