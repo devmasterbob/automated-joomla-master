@@ -1,24 +1,26 @@
-# 🚀 Automatisierte Joomla Entwicklungsumgebung
+# 🚀 Automated Joomla Master
 
-Eine vollständig automatisierte Docker-basierte Joomla CMS Entwicklungsumgebung mit MySQL und phpMyAdmin - **keine manuelle Browser-Installation erforderlich!**
+**The ultimate automated Docker-based Joomla CMS development-to-production system** with Landing Page, MySQL, and phpMyAdmin - **no manual browser installation required!**
 
-## 🌟 Features
+> 🌟 **Professional Joomla development environment** - From zero to running Joomla in under 3 minutes!
 
-- ✅ **Vollautomatische Joomla Installation** - kein manuelles Setup im Browser
-- ✅ **Joomla 5** mit PHP 8.3 und Apache
-- ✅ **MySQL 8.0** Datenbank
-- ✅ **phpMyAdmin** für Datenbankmanagement
-- ✅ **Projekt Landing-Page** - Übersicht und Informationen
-- ✅ **Konfiguration über .env Datei** - alles in einer Datei
-- ✅ **Produktionsreife Optimierungen** (OPcache, Apache Module)
-- ✅ **Zwei Versionen verfügbar** - einfach und erweitert
+## 🌟 Key Features
 
-## 🎯 Verfügbare Versionen
+- ✅ **Fully Automated Joomla Installation** - zero manual browser setup
+- ✅ **4-Container Architecture** - Landing Page + Joomla 5 + MySQL 8.0 + phpMyAdmin  
+- ✅ **Interactive Development History** - Complete project documentation in Landing Page
+- ✅ **Provider Deployment Tools** - One-click database export for production
+- ✅ **VS Code Integration** - Professional development workflow  
+- ✅ **Environment-based Configuration** - All settings in .env file
+- ✅ **Production-Ready Optimizations** (OPcache, Apache modules)
+- ✅ **Multiple Complexity Levels** - Choose your version
 
-| Branch | Beschreibung | Komponenten |
-|--------|--------------|-------------|
-| **`main`** | **Hauptversion** (empfohlen) | Joomla + MySQL + phpMyAdmin + Landing-Page + Vollautomatisierung |
-| `rollback-to-646a5ab` | **Einfache Version** | Joomla + MySQL (minimal) |
+## 🎯 Available Versions
+
+| Branch | Description | Components |
+|--------|-------------|------------|
+| **`main`** | **Master Version** (recommended) | Landing Page + Joomla + MySQL + phpMyAdmin + Full Automation |
+| `rollback-to-646a5ab` | **Minimal Version** | Joomla + MySQL (basic setup) |
 
 ## 🚀 Schnellstart für neue Projekte
 
@@ -35,7 +37,7 @@ code .
 - Repository direkt ins aktuelle Verzeichnis klonen:
 
 ```bash
-git clone https://github.com/devmasterbob/web-joomla-master-2508-09.git .
+git clone https://github.com/devmasterbob/automated-joomla-master.git .
 ```
 
 ### 3. Branch wählen (optional)
