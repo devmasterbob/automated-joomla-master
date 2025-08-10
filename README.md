@@ -76,7 +76,24 @@ JOOMLA_SITE_NAME=Mein Joomla Projekt
 docker-compose up -d
 ```
 
-### 6. ✅ Fertig!
+### 6. ⏱️ **WICHTIG: Warten Sie 2-3 Minuten!**
+> **🚨 Das System braucht Zeit für die automatische Installation!**
+> 
+> **Was passiert im Hintergrund:**
+> - Joomla wird heruntergeladen
+> - Datenbank wird automatisch eingerichtet
+> - Joomla wird vollständig installiert
+> - Installation-Verzeichnis wird automatisch entfernt
+> 
+> **Bitte haben Sie Geduld!** Öffnen Sie http://localhost:80 erst nach **2-3 Minuten**.
+> 
+> **Status prüfen:**
+> ```bash
+> # Container-Logs verfolgen (optional):
+> docker-compose logs -f joomla
+> ```
+
+### 7. ✅ Fertig!
 - **Joomla:** http://localhost:80
 - **phpMyAdmin:** http://localhost:82
 
@@ -162,6 +179,18 @@ curl -o joomla.tar.zst -SL https://github.com/joomla/joomla-cms/releases/downloa
 ```
 
 ## 🐛 Troubleshooting
+
+### ⏱️ "Joomla lädt nicht" / "Seite nicht verfügbar"
+**LÖSUNG:** Warten Sie 2-3 Minuten nach `docker-compose up -d`!
+```bash
+# Status der Container prüfen:
+docker-compose ps
+
+# Installation verfolgen:
+docker-compose logs -f joomla
+
+# Warten bis Sie sehen: "Complete! Joomla has been successfully copied"
+```
 
 ### Container starten nicht
 ```bash
