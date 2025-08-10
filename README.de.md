@@ -1,8 +1,8 @@
 # 🚀 Automated Joomla Master
 
-> **🌍 [Deutsch](README.de.md) | English | [Add your language](https://github.com/devmasterbob/automated-joomla-master/issues)**
+> **🌍 Deutsch | [English](README.md) | [Weitere Sprachen](https://github.com/devmasterbob/automated-joomla-master/issues)**
 
-**The ultimate automated Docker-based Joomla CMS development-to-production system** with Interactive Landing Page, MySQL, and phpMyAdmin - **no manual browser installation required!**
+**Das ultimative automatisierte Docker-basierte Joomla CMS Development-to-Production System** mit interaktiver Landing Page, MySQL und phpMyAdmin - **keine manuelle Browser-Installation erforderlich!**
 
 [![GitHub stars](https://img.shields.io/github/stars/devmasterbob/automated-joomla-master?style=social)](https://github.com/devmasterbob/automated-joomla-master/stargazers)
 [![GitHub license](https://img.shields.io/github/license/devmasterbob/automated-joomla-master)](https://github.com/devmasterbob/automated-joomla-master/blob/main/LICENSE)
@@ -11,7 +11,7 @@
 
 ## 🎬 Quick Demo
 
-**From zero to production-ready Joomla in under 3 minutes!**
+1. **Clone** → 2. **Configure** → 3. **Run** → **✨ Ready!**
 
 ```bash
 git clone https://github.com/devmasterbob/automated-joomla-master.git my-joomla-project
