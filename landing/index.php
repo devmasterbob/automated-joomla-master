@@ -61,7 +61,7 @@ $joomlaDbName = getenv('JOOMLA_DB_NAME');
     <div id="chat-history-content" style="display: none; margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 10px; box-shadow: 0 8px 25px rgba(0,0,0,0.1);">
         <?php
         // CHAT_HISTORY.md einlesen und als HTML formatieren
-        $chatHistoryPath = '../CHAT_HISTORY.md';
+        $chatHistoryPath = '/var/www/CHAT_HISTORY.md';
         if (file_exists($chatHistoryPath)) {
             $chatContent = file_get_contents($chatHistoryPath);
             

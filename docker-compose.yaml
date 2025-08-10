@@ -9,6 +9,7 @@ services:
       - .env
     volumes:
       - ./landing:/var/www/html
+      - ./CHAT_HISTORY.md:/var/www/CHAT_HISTORY.md:ro
     networks:
       - joomla_network
 
