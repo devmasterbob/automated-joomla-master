@@ -1,24 +1,25 @@
 services:
   joomla:
-    build:
-      context: .
-      dockerfile: Dockerfile.joomla
-    image: joomla
+    image: joomla:5-php8.3-apache
     container_name: ${PROJECT_NAME}-joomla
     restart: always
     ports:
       - ${PORT_JOOMLA}:80
     env_file:
       - .env
+    environment:
+      - JOOMLA_DB_HOST=${JOOMLA_DB_HOST}
+      - JOOMLA_DB_USER=${JOOMLA_DB_USER}
+      - JOOMLA_DB_PASSWORD=${JOOMLA_DB_PASSWORD}
+      - JOOMLA_DB_NAME=${JOOMLA_DB_NAME}
     volumes:
       - ./joomla:/var/www/html
     networks:
       - joomla_network
+    depends_on:
+      - db
 
   db:
-    build:
-      context: ./mysql
-      dockerfile: Dockerfile.mysql
     image: mysql:8.0
     container_name: ${PROJECT_NAME}-mysql
     restart: always
@@ -33,18 +34,15 @@ services:
       - joomla_network
 
   phpmyadmin:
-    build:
-      context: ./phpmyadmin
-      dockerfile: Dockerfile.phpmyadmin
     image: phpmyadmin:latest
     container_name: ${PROJECT_NAME}-phpmyadmin
+    restart: always
     depends_on:
       - db
     env_file:
       - .env
     ports:
       - "${PORT_PHPMYADMIN}:80"
-    restart: always
     networks:
       - joomla_network
 
