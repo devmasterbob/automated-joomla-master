@@ -1,4 +1,17 @@
 services:
+  landing:
+    image: php:8.3-apache
+    container_name: ${PROJECT_NAME}-landing
+    restart: always
+    ports:
+      - ${PORT_LANDING}:80
+    env_file:
+      - .env
+    volumes:
+      - ./landing:/var/www/html
+    networks:
+      - joomla_network
+
   joomla:
     image: joomla:5-php8.3-apache
     container_name: ${PROJECT_NAME}-joomla

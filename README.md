@@ -8,6 +8,7 @@ Eine vollständig automatisierte Docker-basierte Joomla CMS Entwicklungsumgebung
 - ✅ **Joomla 5** mit PHP 8.3 und Apache
 - ✅ **MySQL 8.0** Datenbank
 - ✅ **phpMyAdmin** für Datenbankmanagement
+- ✅ **Projekt Landing-Page** - Übersicht und Informationen
 - ✅ **Konfiguration über .env Datei** - alles in einer Datei
 - ✅ **Produktionsreife Optimierungen** (OPcache, Apache Module)
 - ✅ **Zwei Versionen verfügbar** - einfach und erweitert
@@ -16,7 +17,7 @@ Eine vollständig automatisierte Docker-basierte Joomla CMS Entwicklungsumgebung
 
 | Branch | Beschreibung | Komponenten |
 |--------|--------------|-------------|
-| **`main`** | **Hauptversion** (empfohlen) | Joomla + MySQL + phpMyAdmin + Vollautomatisierung |
+| **`main`** | **Hauptversion** (empfohlen) | Joomla + MySQL + phpMyAdmin + Landing-Page + Vollautomatisierung |
 | `rollback-to-646a5ab` | **Einfache Version** | Joomla + MySQL (minimal) |
 
 ## 🚀 Schnellstart für neue Projekte
@@ -94,12 +95,14 @@ docker-compose up -d
 > ```
 
 ### 7. ✅ Fertig!
+- **Projekt-Info:** http://localhost:81
 - **Joomla:** http://localhost:80
 - **phpMyAdmin:** http://localhost:82
 
 ## 🔧 Konfiguration
 
 ### Standard-Ports
+- **Projekt-Info:** Port 81
 - **Joomla:** Port 80
 - **phpMyAdmin:** Port 82
 - **MySQL:** Port 3306 (intern)
@@ -126,6 +129,10 @@ docker-compose up -d
 ├── docker-entrypoint.sh  # Automatisierungsskript
 ├── setup-joomla.sh       # Joomla Setup Automatisierung
 ├── install-joomla-db.php # Datenbank Installation
+├── landing/              # Projekt Landing-Page (Port 81)
+│   ├── index.php        # Projekt-Informationsseite
+│   ├── style.css        # Styling
+│   └── favicon.*        # Icons
 └── joomla/               # Joomla Dateien (Volume Mount)
 ```
 
@@ -168,6 +175,7 @@ Alle Joomla-Dateien befinden sich im `joomla/` Ordner und können direkt bearbei
 ### Andere Ports verwenden
 In `.env` ändern:
 ```env
+PORT_LANDING=8081
 PORT_JOOMLA=8080
 PORT_PHPMYADMIN=8082
 ```
@@ -196,6 +204,7 @@ docker-compose logs -f joomla
 ```bash
 # Ports überprüfen
 netstat -an | grep :80
+netstat -an | grep :81
 netstat -an | grep :82
 
 # Container-Status prüfen
