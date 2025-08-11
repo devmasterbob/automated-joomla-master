@@ -31,27 +31,22 @@ if (Test-Path ".env") {
         $keysToUpdate = @()
         $iteration++
         
-        Write-Host "🔧 Resolving variables (iteration $iteration)..." -ForegroundColor Yellow
-        
         # Find keys that need updating (don't modify during enumeration)
         foreach ($key in $envVariables.Keys) {
             $value = $envVariables[$key]
             # Check for ${VARIABLE} pattern
             if ($value -match '\$\{([^}]+)\}') {
                 $varName = $Matches[1]
-                Write-Host "   Found reference: $key = $value (references $varName)" -ForegroundColor Gray
                 if ($envVariables.ContainsKey($varName)) {
                     # Check for self-reference (circular reference)
                     if ($key -eq $varName) {
-                        Write-Host "   ⚠️ Self-reference detected: $key = $value - skipping" -ForegroundColor Yellow
+                        # Skip self-references to avoid infinite loops
+                        continue
                     }
                     else {
                         $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
                         $resolved = $false
                     }
-                }
-                else {
-                    Write-Host "   ⚠️ Warning: Variable $varName not found for $key" -ForegroundColor Red
                 }
             }
         }
@@ -64,35 +59,14 @@ if (Test-Path ".env") {
             
             # Use simple string replacement instead of regex
             $newValue = $oldValue.Replace("`${$targetVar}", $replacementValue)
-            
-            Write-Host "   Updating: $($update.Key)" -ForegroundColor Green
-            Write-Host "     Old: $oldValue" -ForegroundColor Gray
-            Write-Host "     New: $newValue" -ForegroundColor Gray
-            Write-Host "     Replacement: $targetVar = $replacementValue" -ForegroundColor Gray
-            
             $envVariables[$update.Key] = $newValue
         }
         
         if ($iteration -ge $maxIterations) {
-            Write-Host "❌ Maximum iterations reached - possible circular reference!" -ForegroundColor Red
             break
         }
         
     } while (-not $resolved)
-    
-    Write-Host "✅ Variable resolution completed in $iteration iterations" -ForegroundColor Green
-    
-    # Debug: Show final values
-    Write-Host "🔍 Final variable values:" -ForegroundColor Magenta
-    foreach ($key in $envVariables.Keys | Sort-Object) {
-        $value = $envVariables[$key]
-        if ($value.Contains('${')) {
-            Write-Host "   ⚠️ $key = $value" -ForegroundColor Red
-        }
-        else {
-            Write-Host "   ✅ $key = $value" -ForegroundColor Green
-        }
-    }
     
     # Set environment variables
     foreach ($key in $envVariables.Keys) {
