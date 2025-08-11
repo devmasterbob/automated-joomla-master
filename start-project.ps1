@@ -7,6 +7,8 @@ Write-Host ""
 # Load .env file to get project name and ports
 if (Test-Path ".env") {
     $envVariables = @{}
+    
+    # First pass: Read all variables
     Get-Content ".env" | ForEach-Object {
         if ($_ -match "^([^#][^=]+)=(.+)$") {
             $key = $Matches[1].Trim()
@@ -16,8 +18,29 @@ if (Test-Path ".env") {
                 $value = $Matches[1]
             }
             $envVariables[$key] = $value
-            [Environment]::SetEnvironmentVariable($key, $value)
         }
+    }
+    
+    # Second pass: Resolve variable substitutions
+    $resolved = $false
+    do {
+        $resolved = $true
+        foreach ($key in $envVariables.Keys) {
+            $value = $envVariables[$key]
+            # Check for ${VARIABLE} pattern
+            if ($value -match '\$\{([^}]+)\}') {
+                $varName = $Matches[1]
+                if ($envVariables.ContainsKey($varName)) {
+                    $envVariables[$key] = $value -replace '\$\{' + [regex]::Escape($varName) + '\}', $envVariables[$varName]
+                    $resolved = $false
+                }
+            }
+        }
+    } while (-not $resolved)
+    
+    # Set environment variables
+    foreach ($key in $envVariables.Keys) {
+        [Environment]::SetEnvironmentVariable($key, $envVariables[$key])
     }
 }
 else {
