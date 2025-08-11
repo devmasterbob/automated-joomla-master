@@ -34,7 +34,7 @@ if (Test-Path ".env") {
             if ($value -match '\$\{([^}]+)\}') {
                 $varName = $Matches[1]
                 if ($envVariables.ContainsKey($varName)) {
-                    $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName}
+                    $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
                     $resolved = $false
                 }
             }
