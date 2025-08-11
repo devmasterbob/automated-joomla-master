@@ -6,9 +6,17 @@ Write-Host ""
 
 # Load .env file to get project name and ports
 if (Test-Path ".env") {
+    $envVariables = @{}
     Get-Content ".env" | ForEach-Object {
         if ($_ -match "^([^#][^=]+)=(.+)$") {
-            [Environment]::SetEnvironmentVariable($Matches[1], $Matches[2])
+            $key = $Matches[1].Trim()
+            $value = $Matches[2].Trim()
+            # Remove quotes if present
+            if ($value -match '^"(.*)"$' -or $value -match "^'(.*)'$") {
+                $value = $Matches[1]
+            }
+            $envVariables[$key] = $value
+            [Environment]::SetEnvironmentVariable($key, $value)
         }
     }
 }
@@ -18,13 +26,22 @@ else {
     exit 1
 }
 
-$projectName = [Environment]::GetEnvironmentVariable("PROJECT_NAME")
-$portLanding = [Environment]::GetEnvironmentVariable("PORT_LANDING")
-$portJoomla = [Environment]::GetEnvironmentVariable("PORT_JOOMLA")
-$portPhpMyAdmin = [Environment]::GetEnvironmentVariable("PORT_PHPMYADMIN")
+$projectName = $envVariables["PROJECT_NAME"]
+$portLanding = $envVariables["PORT_LANDING"]
+$portJoomla = $envVariables["PORT_JOOMLA"] 
+$portPhpMyAdmin = $envVariables["PORT_PHPMYADMIN"]
+
+# Validate project name
+if (-not $projectName -or $projectName -eq "" -or $projectName -eq "your-new-project-name") {
+    Write-Host "❌ PROJECT_NAME not set or still default value!" -ForegroundColor Red
+    Write-Host "💡 Please edit .env file and set PROJECT_NAME to your project name" -ForegroundColor Yellow
+    Write-Host "   Example: PROJECT_NAME=my-joomla-site" -ForegroundColor Cyan
+    exit 1
+}
 
 # Start containers
 Write-Host "🔄 Starting Docker containers..." -ForegroundColor Cyan
+Write-Host "   Project Name: $projectName" -ForegroundColor Gray
 docker-compose up -d
 
 if ($LASTEXITCODE -eq 0) {
