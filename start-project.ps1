@@ -173,8 +173,8 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "   🗄️ phpMyAdmin:    http://localhost:$portPhpMyAdmin" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "🔐 Default Login Credentials:" -ForegroundColor White
-    Write-Host "   Joomla Admin:  joomla / joomla@secured" -ForegroundColor Green
-    Write-Host "   phpMyAdmin:    root / rootpass" -ForegroundColor Green
+    Write-Host "   Joomla Admin:  $($envVariables['JOOMLA_ADMIN_USERNAME']) / $($envVariables['JOOMLA_ADMIN_PASSWORD'])" -ForegroundColor Green
+    Write-Host "   phpMyAdmin:    root / $($envVariables['MYSQL_ROOT_PASSWORD'])" -ForegroundColor Green
     Write-Host ""
     Write-Host "💡 Pro Tip: Start with http://localhost:$portLanding for project overview!" -ForegroundColor Magenta
     Write-Host ""
