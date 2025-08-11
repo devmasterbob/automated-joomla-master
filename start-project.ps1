@@ -103,9 +103,48 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "🎉                 CONTAINERS STARTED SUCCESSFULLY!" -ForegroundColor Green
     Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Green
     Write-Host ""
-    Write-Host "⏰ IMPORTANT: Please wait 2-3 minutes for full initialization!" -ForegroundColor Yellow -BackgroundColor DarkBlue
+    Write-Host "🔄 Monitoring Joomla installation..." -ForegroundColor Yellow
+    Write-Host "   (This will take 2-3 minutes - please wait)" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "📋 Your URLs will be available at:" -ForegroundColor White
+    
+    # Monitor Joomla installation
+    $maxAttempts = 30
+    $attempt = 0
+    $joomlaContainerName = "$projectName-joomla"
+    
+    do {
+        $attempt++
+        Start-Sleep -Seconds 6
+        
+        # Get container logs
+        $logs = docker logs $joomlaContainerName --tail 5 2>$null
+        if ($logs) {
+            $latestLog = $logs | Select-Object -Last 1
+            if ($latestLog -match "copying now") {
+                Write-Host "   📥 Copying Joomla files..." -ForegroundColor Cyan
+            }
+            elseif ($latestLog -match "database") {
+                Write-Host "   🗄️ Setting up database..." -ForegroundColor Cyan
+            }
+            elseif ($latestLog -match "Joomla installation completed") {
+                Write-Host "   ✅ Joomla installation completed!" -ForegroundColor Green
+                break
+            }
+            elseif ($latestLog -match "configured -- resuming normal") {
+                Write-Host "   🚀 Apache server ready!" -ForegroundColor Green
+                Write-Host "   ⏳ Finishing installation..." -ForegroundColor Cyan
+            }
+        }
+        
+        # Show progress dots
+        Write-Host "   $("." * ($attempt % 4))   " -ForegroundColor Gray -NoNewline
+        Write-Host "`r" -NoNewline
+        
+    } while ($attempt -lt $maxAttempts)
+    
+    Write-Host ""
+    Write-Host ""
+    Write-Host "📋 Your URLs are now available:" -ForegroundColor White
     Write-Host "   🏠 Project Info:  http://localhost:$portLanding" -ForegroundColor Cyan
     Write-Host "   🌍 Joomla CMS:    http://localhost:$portJoomla" -ForegroundColor Cyan  
     Write-Host "   🗄️ phpMyAdmin:    http://localhost:$portPhpMyAdmin" -ForegroundColor Cyan
