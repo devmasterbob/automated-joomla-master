@@ -43,7 +43,8 @@ if (Test-Path ".env") {
                 if ($envVariables.ContainsKey($varName)) {
                     $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
                     $resolved = $false
-                } else {
+                }
+                else {
                     Write-Host "   ⚠️ Warning: Variable $varName not found for $key" -ForegroundColor Red
                 }
             }
