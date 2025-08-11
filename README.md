@@ -97,17 +97,17 @@ cp .env-example .env
 Change in the `.env` file at minimum:
 
 ```env
-# MUST be changed - use project folder name:
-PROJECT_NAME=my-awesome-joomla-project
+# MUST be changed - use your project folder name:
+PROJECT_NAME=your-actual-project-name
 
 # Security - use your own passwords:
-MYSQL_PASSWORD=my-secure-password
-MYSQL_ROOT_PASSWORD=my-root-password
-JOOMLA_ADMIN_PASSWORD=my-admin-password
+MYSQL_PASSWORD=your-secure-password
+MYSQL_ROOT_PASSWORD=your-root-password
+JOOMLA_ADMIN_PASSWORD=your-admin-password
 
 # Optional customization:
-JOOMLA_ADMIN_EMAIL=admin@mydomain.com
-JOOMLA_SITE_NAME=My Joomla Project
+JOOMLA_ADMIN_EMAIL=your-email@your-domain.com
+JOOMLA_SITE_NAME=Your Project Name
 ```
 
 #### 5. Start System (Option A - With Beautiful Notifications)
