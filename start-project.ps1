@@ -103,47 +103,70 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "🎉                 CONTAINERS STARTED SUCCESSFULLY!" -ForegroundColor Green
     Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Green
     Write-Host ""
-    Write-Host "🔄 Monitoring Joomla installation..." -ForegroundColor Yellow
-    Write-Host "   (This will take 2-3 minutes - please wait)" -ForegroundColor Gray
-    Write-Host ""
     
-    # Monitor Joomla installation
-    $maxAttempts = 30
-    $attempt = 0
-    $joomlaContainerName = "$projectName-joomla"
+    # Check if Joomla is already installed by looking for configuration.php
+    $joomlaPath = "./joomla"
+    $configExists = Test-Path "$joomlaPath/configuration.php"
+    $isConfigured = $false
     
-    do {
-        $attempt++
-        Start-Sleep -Seconds 6
-        
-        # Get container logs
-        $logs = docker logs $joomlaContainerName --tail 5 2>$null
-        if ($logs) {
-            $latestLog = $logs | Select-Object -Last 1
-            if ($latestLog -match "copying now") {
-                Write-Host "   📥 Copying Joomla files..." -ForegroundColor Cyan
-            }
-            elseif ($latestLog -match "database") {
-                Write-Host "   🗄️ Setting up database..." -ForegroundColor Cyan
-            }
-            elseif ($latestLog -match "Joomla installation completed") {
-                Write-Host "   ✅ Joomla installation completed!" -ForegroundColor Green
-                break
-            }
-            elseif ($latestLog -match "configured -- resuming normal") {
-                Write-Host "   🚀 Apache server ready!" -ForegroundColor Green
-                Write-Host "   ⏳ Finishing installation..." -ForegroundColor Cyan
-            }
+    if ($configExists) {
+        $configContent = Get-Content "$joomlaPath/configuration.php" -Raw -ErrorAction SilentlyContinue
+        if ($configContent -and $configContent.Contains('$host') -and $configContent.Contains('$user')) {
+            $isConfigured = $true
         }
-        
-        # Show progress dots
-        Write-Host "   $("." * ($attempt % 4))   " -ForegroundColor Gray -NoNewline
-        Write-Host "`r" -NoNewline
-        
-    } while ($attempt -lt $maxAttempts)
+    }
     
-    Write-Host ""
-    Write-Host ""
+    if (-not $isConfigured) {
+        # Fresh installation - show monitoring
+        Write-Host "🔄 Monitoring Joomla installation..." -ForegroundColor Yellow
+        Write-Host "   (This will take 2-3 minutes - please wait)" -ForegroundColor Gray
+        Write-Host ""
+        
+        # Monitor Joomla installation
+        $maxAttempts = 30
+        $attempt = 0
+        $joomlaContainerName = "$projectName-joomla"
+        
+        do {
+            $attempt++
+            Start-Sleep -Seconds 6
+            
+            # Get container logs
+            $logs = docker logs $joomlaContainerName --tail 5 2>$null
+            if ($logs) {
+                $latestLog = $logs | Select-Object -Last 1
+                if ($latestLog -match "copying now") {
+                    Write-Host "   📥 Copying Joomla files..." -ForegroundColor Cyan
+                }
+                elseif ($latestLog -match "database") {
+                    Write-Host "   🗄️ Setting up database..." -ForegroundColor Cyan
+                }
+                elseif ($latestLog -match "Joomla installation completed") {
+                    Write-Host "   ✅ Joomla installation completed!" -ForegroundColor Green
+                    break
+                }
+                elseif ($latestLog -match "configured -- resuming normal") {
+                    Write-Host "   🚀 Apache server ready!" -ForegroundColor Green
+                    Write-Host "   ⏳ Finishing installation..." -ForegroundColor Cyan
+                }
+            }
+            
+            # Show progress dots
+            Write-Host "   $("." * ($attempt % 4))   " -ForegroundColor Gray -NoNewline
+            Write-Host "`r" -NoNewline
+            
+        } while ($attempt -lt $maxAttempts)
+        
+        Write-Host ""
+        Write-Host ""
+    }
+    else {
+        # Existing installation - quick start
+        Write-Host "✅ Existing Joomla installation detected - starting quickly..." -ForegroundColor Green
+        Write-Host ""
+        Start-Sleep -Seconds 2
+    }
+    
     Write-Host "📋 Your URLs are now available:" -ForegroundColor White
     Write-Host "   🏠 Project Info:  http://localhost:$portLanding" -ForegroundColor Cyan
     Write-Host "   🌍 Joomla CMS:    http://localhost:$portJoomla" -ForegroundColor Cyan  
