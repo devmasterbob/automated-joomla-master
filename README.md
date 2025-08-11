@@ -195,6 +195,23 @@ public $db = 'your-provider-db-name';
 
 ## 🔧 Troubleshooting
 
+### ❌ Error 500 / "This page isn't working"
+
+**Most common cause:** Old MySQL volumes with wrong passwords
+
+**Solution:**
+```bash
+# IMPORTANT: Use complete cleanup for fresh restart
+docker-compose down -v --remove-orphans
+.\start-project.ps1
+```
+
+**Why this happens:**
+- Docker volumes persist MySQL data between restarts
+- If you change passwords in `.env`, old passwords remain in volumes
+- `-v` removes all volumes (including database)
+- `--remove-orphans` removes all related containers
+
 ### Container Won't Start
 ```bash
 # Check container status
