@@ -23,9 +23,15 @@ if (Test-Path ".env") {
     
     # Second pass: Resolve variable substitutions
     $resolved = $false
+    $maxIterations = 10  # Prevent infinite loops
+    $iteration = 0
+    
     do {
         $resolved = $true
         $keysToUpdate = @()
+        $iteration++
+        
+        Write-Host "🔧 Resolving variables (iteration $iteration)..." -ForegroundColor Yellow
         
         # Find keys that need updating (don't modify during enumeration)
         foreach ($key in $envVariables.Keys) {
@@ -33,9 +39,12 @@ if (Test-Path ".env") {
             # Check for ${VARIABLE} pattern
             if ($value -match '\$\{([^}]+)\}') {
                 $varName = $Matches[1]
+                Write-Host "   Found reference: $key = $value (references $varName)" -ForegroundColor Gray
                 if ($envVariables.ContainsKey($varName)) {
                     $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
                     $resolved = $false
+                } else {
+                    Write-Host "   ⚠️ Warning: Variable $varName not found for $key" -ForegroundColor Red
                 }
             }
         }
@@ -43,9 +52,18 @@ if (Test-Path ".env") {
         # Now update the keys
         foreach ($update in $keysToUpdate) {
             $newValue = $update.OldValue -replace '\$\{' + [regex]::Escape($update.VarName) + '\}', $envVariables[$update.VarName]
+            Write-Host "   Updating: $($update.Key) = $newValue" -ForegroundColor Green
             $envVariables[$update.Key] = $newValue
         }
+        
+        if ($iteration -ge $maxIterations) {
+            Write-Host "❌ Maximum iterations reached - possible circular reference!" -ForegroundColor Red
+            break
+        }
+        
     } while (-not $resolved)
+    
+    Write-Host "✅ Variable resolution completed in $iteration iterations" -ForegroundColor Green
     
     # Set environment variables
     foreach ($key in $envVariables.Keys) {
