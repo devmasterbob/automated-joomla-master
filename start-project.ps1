@@ -41,8 +41,14 @@ if (Test-Path ".env") {
                 $varName = $Matches[1]
                 Write-Host "   Found reference: $key = $value (references $varName)" -ForegroundColor Gray
                 if ($envVariables.ContainsKey($varName)) {
-                    $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
-                    $resolved = $false
+                    # Check for self-reference (circular reference)
+                    if ($key -eq $varName) {
+                        Write-Host "   ⚠️ Self-reference detected: $key = $value - skipping" -ForegroundColor Yellow
+                    }
+                    else {
+                        $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
+                        $resolved = $false
+                    }
                 }
                 else {
                     Write-Host "   ⚠️ Warning: Variable $varName not found for $key" -ForegroundColor Red
