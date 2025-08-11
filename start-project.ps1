@@ -25,16 +25,25 @@ if (Test-Path ".env") {
     $resolved = $false
     do {
         $resolved = $true
+        $keysToUpdate = @()
+        
+        # Find keys that need updating (don't modify during enumeration)
         foreach ($key in $envVariables.Keys) {
             $value = $envVariables[$key]
             # Check for ${VARIABLE} pattern
             if ($value -match '\$\{([^}]+)\}') {
                 $varName = $Matches[1]
                 if ($envVariables.ContainsKey($varName)) {
-                    $envVariables[$key] = $value -replace '\$\{' + [regex]::Escape($varName) + '\}', $envVariables[$varName]
+                    $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName}
                     $resolved = $false
                 }
             }
+        }
+        
+        # Now update the keys
+        foreach ($update in $keysToUpdate) {
+            $newValue = $update.OldValue -replace '\$\{' + [regex]::Escape($update.VarName) + '\}', $envVariables[$update.VarName]
+            $envVariables[$update.Key] = $newValue
         }
     } while (-not $resolved)
     
