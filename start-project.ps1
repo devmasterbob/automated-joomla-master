@@ -52,8 +52,18 @@ if (Test-Path ".env") {
         
         # Now update the keys
         foreach ($update in $keysToUpdate) {
-            $newValue = $update.OldValue -replace '\$\{' + [regex]::Escape($update.VarName) + '\}', $envVariables[$update.VarName]
-            Write-Host "   Updating: $($update.Key) = $newValue" -ForegroundColor Green
+            $oldValue = $update.OldValue
+            $targetVar = $update.VarName
+            $replacementValue = $envVariables[$targetVar]
+            
+            # Use simple string replacement instead of regex
+            $newValue = $oldValue.Replace("`${$targetVar}", $replacementValue)
+            
+            Write-Host "   Updating: $($update.Key)" -ForegroundColor Green
+            Write-Host "     Old: $oldValue" -ForegroundColor Gray
+            Write-Host "     New: $newValue" -ForegroundColor Gray
+            Write-Host "     Replacement: $targetVar = $replacementValue" -ForegroundColor Gray
+            
             $envVariables[$update.Key] = $newValue
         }
         
@@ -65,6 +75,18 @@ if (Test-Path ".env") {
     } while (-not $resolved)
     
     Write-Host "✅ Variable resolution completed in $iteration iterations" -ForegroundColor Green
+    
+    # Debug: Show final values
+    Write-Host "🔍 Final variable values:" -ForegroundColor Magenta
+    foreach ($key in $envVariables.Keys | Sort-Object) {
+        $value = $envVariables[$key]
+        if ($value.Contains('${')) {
+            Write-Host "   ⚠️ $key = $value" -ForegroundColor Red
+        }
+        else {
+            Write-Host "   ✅ $key = $value" -ForegroundColor Green
+        }
+    }
     
     # Set environment variables
     foreach ($key in $envVariables.Keys) {
