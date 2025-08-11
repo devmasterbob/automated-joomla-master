@@ -17,7 +17,7 @@
 git clone https://github.com/devmasterbob/automated-joomla-master.git my-joomla-project
 cd my-joomla-project
 cp .env-example .env
-docker-compose up -d
+.\start-project.ps1
 # Wait 2-3 minutes ⏰ 
 # Open: http://localhost:81 🎉
 ```
@@ -110,7 +110,15 @@ JOOMLA_ADMIN_EMAIL=admin@mydomain.com
 JOOMLA_SITE_NAME=My Joomla Project
 ```
 
-#### 5. Start System
+#### 5. Start System (Option A - With Beautiful Notifications)
+```bash
+# In VS Code Terminal - RECOMMENDED:
+.\start-project.ps1
+```
+
+**OR**
+
+#### 5. Start System (Option B - Standard)
 ```bash
 # In VS Code Terminal:
 docker-compose up -d
