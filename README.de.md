@@ -93,10 +93,13 @@ cp .env-example .env
 # MUSS geändert werden - Name des Projektordners verwenden:
 PROJECT_NAME=mein-neues-projekt
 
-# Sicherheit - eigene Passwörter verwenden:
-MYSQL_PASSWORD=mein-sicheres-passwort
-MYSQL_ROOT_PASSWORD=mein-root-passwort
-JOOMLA_ADMIN_PASSWORD=mein-admin-passwort
+# Sicherheit - eigene Passwörter verwenden (mindestens 12 Zeichen!):
+MYSQL_PASSWORD=mysql12345678
+MYSQL_ROOT_PASSWORD=mysql12345678
+JOOMLA_ADMIN_PASSWORD=admin12345678
+```
+
+**⚠️ WICHTIG:** Alle Passwörter müssen **mindestens 12 Zeichen** lang sein, sonst schlägt die automatische Installation fehl!
 
 # Optional anpassen:
 JOOMLA_ADMIN_EMAIL=admin@meinedomain.com

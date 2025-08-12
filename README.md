@@ -100,10 +100,13 @@ Change in the `.env` file at minimum:
 # MUST be changed - use your project folder name:
 PROJECT_NAME=your-actual-project-name
 
-# Security - use your own passwords:
-MYSQL_PASSWORD=your-secure-password
-MYSQL_ROOT_PASSWORD=your-root-password
-JOOMLA_ADMIN_PASSWORD=your-admin-password
+# Security - use your own passwords (minimum 12 characters required!):
+MYSQL_PASSWORD=mysql12345678
+MYSQL_ROOT_PASSWORD=mysql12345678
+JOOMLA_ADMIN_PASSWORD=admin12345678
+```
+
+**⚠️ IMPORTANT:** All passwords must be **at least 12 characters** long, otherwise the automatic installation will fail!
 
 # Optional customization:
 JOOMLA_ADMIN_EMAIL=your-email@your-domain.com
