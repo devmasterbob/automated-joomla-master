@@ -190,6 +190,11 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "   🌍 Joomla CMS:    http://localhost:$portJoomla" -ForegroundColor Cyan  
     Write-Host "   🗄️ phpMyAdmin:    http://localhost:$portPhpMyAdmin" -ForegroundColor Cyan
     Write-Host ""
+    Write-Host "⚠️  IMPORTANT: If you get 'Error 500' on first visit:" -ForegroundColor Yellow
+    Write-Host "   • Wait 30 seconds more for full installation" -ForegroundColor Yellow  
+    Write-Host "   • Clear browser cache (Ctrl+F5)" -ForegroundColor Yellow
+    Write-Host "   • Or run: docker-compose down -v --remove-orphans && .\start-project.ps1" -ForegroundColor Yellow
+    Write-Host ""
     Write-Host "🔐 Default Login Credentials:" -ForegroundColor White
     Write-Host "   Joomla Admin:  admin / (see .env file)" -ForegroundColor Green
     Write-Host "   phpMyAdmin:    root / (see .env file)" -ForegroundColor Green
