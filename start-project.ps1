@@ -13,9 +13,9 @@ if (-not (Test-Path ".env") -and (Test-Path ".env-example")) {
     
     # Validate folder name for Docker compatibility
     if ($currentFolderName -match "^[a-z0-9][a-z0-9_-]*$") {
-        # Copy template and replace PROJECT_NAME
+        # Copy template and replace CURRENT_FOLDER placeholder
         $envContent = Get-Content ".env-example" -Raw
-        $envContent = $envContent -replace "PROJECT_NAME=my-awesome-joomla-project", "PROJECT_NAME=$currentFolderName"
+        $envContent = $envContent -replace "\$\{CURRENT_FOLDER\}", $currentFolderName
         $envContent | Set-Content ".env" -NoNewline
         
         Write-Host "✅ Created .env with PROJECT_NAME=$currentFolderName" -ForegroundColor Green
@@ -44,6 +44,14 @@ if (Test-Path ".env") {
                 $value = $Matches[1]
             }
             $envVariables[$key] = $value
+        }
+    }
+    
+    # Replace CURRENT_FOLDER placeholder with actual folder name
+    $currentFolderName = Split-Path -Leaf (Get-Location)
+    foreach ($key in $envVariables.Keys.Clone()) {
+        if ($envVariables[$key] -eq '${CURRENT_FOLDER}') {
+            $envVariables[$key] = $currentFolderName
         }
     }
     
