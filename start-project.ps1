@@ -4,6 +4,32 @@
 Write-Host "🚀 Starting Automated Joomla Master..." -ForegroundColor Green
 Write-Host ""
 
+# Auto-generate .env from template if it doesn't exist
+if (-not (Test-Path ".env") -and (Test-Path ".env-example")) {
+    Write-Host "📝 Creating .env from template..." -ForegroundColor Cyan
+    
+    # Get current folder name for PROJECT_NAME
+    $currentFolderName = Split-Path -Leaf (Get-Location)
+    
+    # Validate folder name for Docker compatibility
+    if ($currentFolderName -match "^[a-z0-9][a-z0-9_-]*$") {
+        # Copy template and replace PROJECT_NAME
+        $envContent = Get-Content ".env-example" -Raw
+        $envContent = $envContent -replace "PROJECT_NAME=my-awesome-joomla-project", "PROJECT_NAME=$currentFolderName"
+        $envContent | Set-Content ".env" -NoNewline
+        
+        Write-Host "✅ Created .env with PROJECT_NAME=$currentFolderName" -ForegroundColor Green
+        Write-Host "💡 Please review and customize .env file if needed" -ForegroundColor Yellow
+        Write-Host ""
+    }
+    else {
+        Write-Host "❌ Folder name '$currentFolderName' is not Docker-compatible!" -ForegroundColor Red
+        Write-Host "💡 Please rename folder to use only: lowercase letters, numbers, hyphens, underscores" -ForegroundColor Yellow
+        Write-Host "   And must start with a letter or number" -ForegroundColor Yellow
+        exit 1
+    }
+}
+
 # Load .env file to get project name and ports
 if (Test-Path ".env") {
     $envVariables = @{}

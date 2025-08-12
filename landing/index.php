@@ -6,7 +6,7 @@ $joomlaDBUser = getenv('JOOMLA_DB_USER');
 $joomlaDBPw = getenv('JOOMLA_DB_PASSWORD');
 $mysqlRootPw = getenv('MYSQL_ROOT_PASSWORD');
 $joomlaSiteName = getenv('JOOMLA_SITE_NAME');
-$joomlaDBName = getenv('JOOMLA_DB_NAME');
+$joomlaDbName = getenv('JOOMLA_DB_NAME');
 $joomlaAdminEmail = getenv('JOOMLA_ADMIN_EMAIL');
 $joomlaDbTyp = getenv('JOOMLA_DB_TYPE');
 $joomlaDbHost = getenv('JOOMLA_DB_HOST');
@@ -128,12 +128,6 @@ $portPhpMyAdmin = getenv('PORT_PHPMYADMIN') ?: '8082';
         </li>
         <li>Joomla Admin Pw :
             <?php echo $joomlaAdminPw; ?>
-        </li>
-         <li>Joomla DB User :
-            <?php echo $joomlaDBUser; ?>
-        </li>
-        <li>Joomla DB User Pw :
-            <?php echo $joomlaDBPw; ?>
         </li>
          <li>MySQL Root Pw :
             <?php echo $mysqlRootPw; ?>
