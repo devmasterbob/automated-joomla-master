@@ -1,19 +1,23 @@
 <?php
 $projectName = getenv('PROJECT_NAME');
+$joomlaAdmin = getenv('JOOMLA_ADMIN_USERNAME');
+$joomlaAdminPw = getenv('JOOMLA_ADMIN_PASSWORD');
 $joomlaDBUser = getenv('JOOMLA_DB_USER'); 
 $joomlaDBPw = getenv('JOOMLA_DB_PASSWORD');
-$joomlaAdmin = getenv('JOOMLA_ADMIN_USER');
-$portJoomla = getenv('PORT_JOOMLA') ?: '80';
-$portPhpMyAdmin = getenv('PORT_PHPMYADMIN') ?: '8082';
-if (!$projectName) {
-    $projectName = 'Joomla Projekt';
-}
-$joomlaAdminPw = getenv('JOOMLA_ADMIN_PASSWORD');
-$joomlaMailFrom = getenv('JOOMLA_MAIL_FROM');
-$joomlaMailFromName = getenv('JOOMLA_MAIL_FROM_NAME'); 
+$mysqlRootPw = getenv('MYSQL_ROOT_PASSWORD');
+$joomlaSiteName = getenv('JOOMLA_SITE_NAME');
+$joomlaDBName = getenv('JOOMLA_DB_NAME');
+$joomlaAdminEmail = getenv('JOOMLA_ADMIN_EMAIL');
 $joomlaDbTyp = getenv('JOOMLA_DB_TYPE');
 $joomlaDbHost = getenv('JOOMLA_DB_HOST');
-$joomlaDbName = getenv('JOOMLA_DB_NAME');
+
+$portJoomla = getenv('PORT_JOOMLA') ?: '80';
+$portPhpMyAdmin = getenv('PORT_PHPMYADMIN') ?: '8082';
+
+
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -113,32 +117,38 @@ $joomlaDbName = getenv('JOOMLA_DB_NAME');
     </ul>
     <p>
     <ul>
-        <li>Joomla Projekt:
+        <li>Projekt Name:
             <?php echo $projectName; ?>
         </li>
-        <li>Joomla User :
-            <?php echo $joomlaDBUser; ?>
+        <li>Joomla Site Name:
+            <?php echo $joomlaSiteName; ?>
         </li>
-        <li>Joomla User Pw :
-            <?php echo $joomlaDBPw; ?>
+        <li>Joomla Admin :
+            <?php echo $joomlaAdmin; ?>
         </li>
         <li>Joomla Admin Pw :
             <?php echo $joomlaAdminPw; ?>
         </li>
-        <li>Mail From :
-            <?php echo $joomlaMailFrom; ?>
+         <li>Joomla DB User :
+            <?php echo $joomlaDBUser; ?>
         </li>
-        <li>Mail From Name :
-            <?php echo $joomlaMailFromName; ?>
+        <li>Joomla DB User Pw :
+            <?php echo $joomlaDBPw; ?>
+        </li>
+         <li>MySQL Root Pw :
+            <?php echo $mysqlRootPw; ?>
+        </li>
+         <li>DB Name :
+            <?php echo $joomlaDbName; ?>
+        </li>
+        <li>Joomla Admin E-Mail :
+            <?php echo $joomlaAdminEmail; ?>
         </li>
         <li>DB Typ :
             <?php echo $joomlaDbTyp; ?>
         </li>
         <li>DB Host :
             <?php echo $joomlaDbHost; ?>
-        </li>
-        <li>DB Name :
-            <?php echo $joomlaDbName; ?>
         </li>
     </ul>
     </p>
