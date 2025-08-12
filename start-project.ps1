@@ -15,72 +15,72 @@ if (-not (Test-Path ".env")) {
 }
 
 # Load .env file to get project name and ports
-    $envVariables = @{}
+$envVariables = @{}
     
-    # First pass: Read all variables
-    Get-Content ".env" | ForEach-Object {
-        if ($_ -match "^([^#][^=]+)=(.+)$") {
-            $key = $Matches[1].Trim()
-            $value = $Matches[2].Trim()
-            # Remove quotes if present
-            if ($value -match '^"(.*)"$' -or $value -match "^'(.*)'$") {
-                $value = $Matches[1]
-            }
-            $envVariables[$key] = $value
+# First pass: Read all variables
+Get-Content ".env" | ForEach-Object {
+    if ($_ -match "^([^#][^=]+)=(.+)$") {
+        $key = $Matches[1].Trim()
+        $value = $Matches[2].Trim()
+        # Remove quotes if present
+        if ($value -match '^"(.*)"$' -or $value -match "^'(.*)'$") {
+            $value = $Matches[1]
         }
+        $envVariables[$key] = $value
     }
+}
     
-    # Second pass: Resolve variable substitutions
-    $resolved = $false
-    $maxIterations = 10  # Prevent infinite loops
-    $iteration = 0
+# Second pass: Resolve variable substitutions
+$resolved = $false
+$maxIterations = 10  # Prevent infinite loops
+$iteration = 0
     
-    do {
-        $resolved = $true
-        $keysToUpdate = @()
-        $iteration++
+do {
+    $resolved = $true
+    $keysToUpdate = @()
+    $iteration++
         
-        # Find keys that need updating (don't modify during enumeration)
-        foreach ($key in $envVariables.Keys) {
-            $value = $envVariables[$key]
-            # Check for ${VARIABLE} pattern
-            if ($value -match '\$\{([^}]+)\}') {
-                $varName = $Matches[1]
-                if ($envVariables.ContainsKey($varName)) {
-                    # Check for self-reference (circular reference)
-                    if ($key -eq $varName) {
-                        # Skip self-references to avoid infinite loops
-                        continue
-                    }
-                    else {
-                        $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
-                        $resolved = $false
-                    }
+    # Find keys that need updating (don't modify during enumeration)
+    foreach ($key in $envVariables.Keys) {
+        $value = $envVariables[$key]
+        # Check for ${VARIABLE} pattern
+        if ($value -match '\$\{([^}]+)\}') {
+            $varName = $Matches[1]
+            if ($envVariables.ContainsKey($varName)) {
+                # Check for self-reference (circular reference)
+                if ($key -eq $varName) {
+                    # Skip self-references to avoid infinite loops
+                    continue
+                }
+                else {
+                    $keysToUpdate += @{Key = $key; OldValue = $value; VarName = $varName }
+                    $resolved = $false
                 }
             }
         }
-        
-        # Now update the keys
-        foreach ($update in $keysToUpdate) {
-            $oldValue = $update.OldValue
-            $targetVar = $update.VarName
-            $replacementValue = $envVariables[$targetVar]
-            
-            # Use simple string replacement instead of regex
-            $newValue = $oldValue.Replace("`${$targetVar}", $replacementValue)
-            $envVariables[$update.Key] = $newValue
-        }
-        
-        if ($iteration -ge $maxIterations) {
-            break
-        }
-        
-    } while (-not $resolved)
-    
-    # Set environment variables
-    foreach ($key in $envVariables.Keys) {
-        [Environment]::SetEnvironmentVariable($key, $envVariables[$key])
     }
+        
+    # Now update the keys
+    foreach ($update in $keysToUpdate) {
+        $oldValue = $update.OldValue
+        $targetVar = $update.VarName
+        $replacementValue = $envVariables[$targetVar]
+            
+        # Use simple string replacement instead of regex
+        $newValue = $oldValue.Replace("`${$targetVar}", $replacementValue)
+        $envVariables[$update.Key] = $newValue
+    }
+        
+    if ($iteration -ge $maxIterations) {
+        break
+    }
+        
+} while (-not $resolved)
+    
+# Set environment variables
+foreach ($key in $envVariables.Keys) {
+    [Environment]::SetEnvironmentVariable($key, $envVariables[$key])
+}
 
 $projectName = $envVariables["PROJECT_NAME"]
 $portLanding = $envVariables["PORT_LANDING"]

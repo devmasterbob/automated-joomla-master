@@ -11,13 +11,14 @@
 
 ## 🎬 Quick Demo
 
-1. **Clone** → 2. **Configure** → 3. **Run** → **✨ Ready!**
+1. **Clone** → 2. **Prepare** → 3. **Configure** → 4. **Run** → **✨ Ready!**
 
 ```bash
 git clone https://github.com/devmasterbob/automated-joomla-master.git my-joomla-project
 cd my-joomla-project
-cp .env-example .env
-docker-compose up -d
+.\prepare.ps1                # Creates .env with correct project name
+# Edit .env file and customize passwords (minimum 12 characters!)
+.\start-project.ps1          # Starts all containers
 # Wait 2-3 minutes ⏰ 
 # Open: http://localhost:81 🎉
 ```
@@ -79,11 +80,22 @@ git clone https://github.com/devmasterbob/automated-joomla-master.git .
 git checkout rollback-to-646a5ab
 ```
 
-### 4. ⚠️ .env Datei anpassen
-**WICHTIG:** Kopieren Sie die `.env-example` zur `.env` und bearbeiten Sie sie:
+### 4. 🔧 Projekt vorbereiten
+**NEU:** Verwenden Sie das Prepare-Script für einfache Einrichtung:
 
+```powershell
+# Projekt automatisch vorbereiten (empfohlen)
+.\prepare.ps1
+```
+
+Das Script:
+- ✅ Aktualisiert `.env-example` mit dem korrekten Projektnamen
+- ✅ Erstellt `.env` Datei automatisch
+- ✅ Zeigt klare Anweisungen für Passwort-Anpassung
+
+**Alternativ (manuell):**
 ```bash
-# .env Datei aus Beispiel erstellen
+# Manuelle .env Erstellung (nur wenn prepare.ps1 nicht verwendet)
 cp .env-example .env
 ```
 
@@ -107,9 +119,9 @@ JOOMLA_SITE_NAME=Mein Joomla Projekt
 ```
 
 ### 5. System starten
-```bash
+```powershell
 # Im VS Code Terminal:
-docker-compose up -d
+.\start-project.ps1
 ```
 
 ### 6. ⏱️ **WICHTIG: Warten Sie 2-3 Minuten!**
@@ -175,11 +187,11 @@ docker-compose up -d
 ## 🛠️ Entwicklung
 
 ### Container verwalten
-```bash
+```powershell
 # Im VS Code Terminal:
 
 # Starten
-docker-compose up -d
+.\start-project.ps1
 
 # Stoppen
 docker-compose down

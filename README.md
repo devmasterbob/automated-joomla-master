@@ -11,12 +11,18 @@
 
 ## 🎬 Quick Demo
 
-**From zero to production-ready Joomla in under 3 minutes!**
+**From zero to production-ready Joomla in under 4 steps!**
 
 ```bash
+# 1. Clone repository
 git clone https://github.com/devmasterbob/automated-joomla-master.git my-joomla-project
 cd my-joomla-project
-cp .env-example .env
+
+# 2. Prepare project
+.\prepare.ps1
+
+# 3. Configure (edit .env as needed)
+# 4. Run
 .\start-project.ps1
 # Wait 2-3 minutes ⏰ 
 # Open: http://localhost:81 🎉
@@ -86,21 +92,35 @@ git clone https://github.com/devmasterbob/automated-joomla-master.git .
 git checkout rollback-to-646a5ab
 ```
 
-#### 4. ⚠️ Configure .env File
-**IMPORTANT:** Copy `.env-example` to `.env` and edit it:
+#### 4. ⚙️ Prepare Project Environment
+**RECOMMENDED APPROACH:** Use automated setup with folder name detection:
 
-```bash
-# Create .env file from example
-cp .env-example .env
+```powershell
+# Automated setup - detects folder name automatically:
+.\prepare.ps1
 ```
 
-Change in the `.env` file at minimum:
+This script will:
+- ✅ Create `.env` file with your actual folder name as PROJECT_NAME
+- ✅ Validate Docker-compatible naming
+- ✅ Guide you through password customization
+- ✅ Show you exactly what to edit
+
+**Alternative:** Manual `.env` creation:
+
+```bash
+# Manual approach (if you prefer):
+cp .env-example .env
+# Then edit .env manually
+```
+
+**🔧 Key Settings to Customize in .env:**
 
 ```env
-# MUST be changed - use your project folder name:
-PROJECT_NAME=your-actual-project-name
+# PROJECT_NAME automatically set by prepare.ps1
+PROJECT_NAME=your-actual-project-name  
 
-# Security - use your own passwords (minimum 12 characters required!):
+# Security - customize these passwords (minimum 12 characters required!):
 MYSQL_PASSWORD=mysql12345678
 MYSQL_ROOT_PASSWORD=mysql12345678
 JOOMLA_ADMIN_PASSWORD=admin12345678
@@ -114,7 +134,7 @@ JOOMLA_SITE_NAME=Your Project Name
 ```
 
 #### 5. Start System (Option A - With Beautiful Notifications)
-```bash
+```powershell
 # In VS Code Terminal - RECOMMENDED:
 .\start-project.ps1
 ```
