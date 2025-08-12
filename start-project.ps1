@@ -92,6 +92,24 @@ if (-not $projectName -or $projectName -eq "" -or $projectName -eq "your-new-pro
     exit 1
 }
 
+# Validate passwords don't contain problematic characters
+$problematicChars = @('$', '`', '"', "'", '\', '§')
+$passwordVars = @('MYSQL_PASSWORD', 'MYSQL_ROOT_PASSWORD', 'JOOMLA_ADMIN_PASSWORD', 'JOOMLA_DB_PASSWORD')
+
+foreach ($passwordVar in $passwordVars) {
+    $passwordValue = $envVariables[$passwordVar]
+    if ($passwordValue) {
+        foreach ($char in $problematicChars) {
+            if ($passwordValue.Contains($char)) {
+                Write-Host "❌ Password contains problematic character '$char' in $passwordVar!" -ForegroundColor Red
+                Write-Host "💡 Please use only: A-Z, a-z, 0-9, -, _, ., +, *, #, @, %, &, (, ), =, ?, !" -ForegroundColor Yellow
+                Write-Host "   Avoid these characters: § dollar-sign backtick quotes backslash" -ForegroundColor Red
+                exit 1
+            }
+        }
+    }
+}
+
 # Start containers
 Write-Host "🔄 Starting Docker containers..." -ForegroundColor Cyan
 Write-Host "   Project Name: $projectName" -ForegroundColor Gray
@@ -111,7 +129,7 @@ if ($LASTEXITCODE -eq 0) {
     
     if ($configExists) {
         $configContent = Get-Content "$joomlaPath/configuration.php" -Raw -ErrorAction SilentlyContinue
-        if ($configContent -and $configContent.Contains('$host') -and $configContent.Contains('$user')) {
+        if ($configContent -and ($configContent.Length -gt 1000)) {
             $isConfigured = $true
         }
     }
@@ -173,8 +191,8 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "   🗄️ phpMyAdmin:    http://localhost:$portPhpMyAdmin" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "🔐 Default Login Credentials:" -ForegroundColor White
-    Write-Host "   Joomla Admin:  $($envVariables['JOOMLA_ADMIN_USERNAME']) / $($envVariables['JOOMLA_ADMIN_PASSWORD'])" -ForegroundColor Green
-    Write-Host "   phpMyAdmin:    root / $($envVariables['MYSQL_ROOT_PASSWORD'])" -ForegroundColor Green
+    Write-Host "   Joomla Admin:  admin / (see .env file)" -ForegroundColor Green
+    Write-Host "   phpMyAdmin:    root / (see .env file)" -ForegroundColor Green
     Write-Host ""
     Write-Host "💡 Pro Tip: Start with http://localhost:$portLanding for project overview!" -ForegroundColor Magenta
     Write-Host ""

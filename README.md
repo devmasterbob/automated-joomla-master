@@ -197,20 +197,32 @@ public $db = 'your-provider-db-name';
 
 ### ❌ Error 500 / "This page isn't working"
 
-**Most common cause:** Old MySQL volumes with wrong passwords
+**Most common causes:**
+1. **Problematic password characters** - `§`, `$`, `` ` ``, `"`, `'`, `\`
+2. **Old MySQL volumes** with wrong passwords
 
-**Solution:**
+**Solutions:**
 ```bash
-# IMPORTANT: Use complete cleanup for fresh restart
+# Step 1: Check your passwords in .env
+# Avoid: § $ ` " ' \ characters
+# Safe: A-Z a-z 0-9 - _ . + * # @ % & ( ) = ? !
+
+# Step 2: Complete cleanup and restart
 docker-compose down -v --remove-orphans
 .\start-project.ps1
 ```
 
-**Why this happens:**
-- Docker volumes persist MySQL data between restarts
-- If you change passwords in `.env`, old passwords remain in volumes
-- `-v` removes all volumes (including database)
-- `--remove-orphans` removes all related containers
+### 🚨 Port Already in Use
+
+**Error:** `port is already allocated`
+
+**Solution:**
+```bash
+# Stop conflicting services
+docker ps  # Check running containers
+docker stop $(docker ps -q)  # Stop all containers
+# Or stop specific services like MySQL, Apache, etc.
+```
 
 ### Container Won't Start
 ```bash
@@ -247,6 +259,7 @@ This is normal during initial setup! Wait 2-3 minutes for automatic installation
 - **Minimum 4GB RAM** for all containers
 - **Windows 10/11** with WSL2, **Linux**, or **macOS**
 - **Modern browser** (Chrome, Firefox, Safari, Edge)
+- **Free Ports:** 80, 81, 82, 3306 (stop any running MySQL/Apache containers first)
 
 ## 🤝 Contributing
 
