@@ -213,6 +213,30 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host ""
     Write-Host "💡 Pro Tip: Start with http://localhost:$portLanding for project overview!" -ForegroundColor Magenta
     Write-Host ""
+    
+    # Auto-cleanup: Remove .git and .github folders to make project completely independent
+    $cleanupPaths = @(".git", ".github")
+    $cleanedItems = @()
+    
+    foreach ($path in $cleanupPaths) {
+        if (Test-Path $path) {
+            try {
+                Remove-Item -Recurse -Force $path -ErrorAction Stop
+                $cleanedItems += $path
+            }
+            catch {
+                Write-Host "⚠️  Could not remove $path folder: $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        }
+    }
+    
+    if ($cleanedItems.Count -gt 0) {
+        Write-Host "🗂️  Removed $($cleanedItems -join ', ') - project ready for own repository" -ForegroundColor Gray
+        Write-Host "💡 To create your own Git repository:" -ForegroundColor Gray
+        Write-Host "   git init && git add . && git commit -m 'Initial Joomla project'" -ForegroundColor DarkGray
+    }
+    
+    Write-Host ""
     Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Green
     Write-Host "   Project: $projectName | Status: Ready for Development! 🚀" -ForegroundColor Green
     Write-Host "═══════════════════════════════════════════════════════════════" -ForegroundColor Green

@@ -50,8 +50,7 @@ cd my-joomla-project
 
 | Branch | Description | Components |
 |--------|-------------|------------|
-| **`main`** | **Master Version** (recommended) | Landing Page + Joomla + MySQL + phpMyAdmin + Full Automation |
-| `rollback-to-646a5ab` | **Minimal Version** | Joomla + MySQL (basic setup) |
+| **`main`** | **Complete Version** (recommended) | Landing Page + Joomla + MySQL + phpMyAdmin + Full Automation |
 
 ## 🚀 Schnellstart für neue Projekte
 
@@ -71,16 +70,7 @@ code .
 git clone https://github.com/devmasterbob/automated-joomla-master.git .
 ```
 
-### 3. Branch wählen (optional)
-```bash
-# Hauptversion verwenden (Standard - bereits aktiv):
-# main Branch ist bereits geladen
-
-# Oder für einfache Version:
-git checkout rollback-to-646a5ab
-```
-
-### 4. 🔧 Projekt vorbereiten
+### 3. 🔧 Projekt vorbereiten
 **NEU:** Verwenden Sie das Prepare-Script für einfache Einrichtung:
 
 ```powershell
@@ -118,13 +108,13 @@ JOOMLA_ADMIN_EMAIL=admin@meinedomain.com
 JOOMLA_SITE_NAME=Mein Joomla Projekt
 ```
 
-### 5. System starten
+### 4. System starten
 ```powershell
 # Im VS Code Terminal:
 .\start-project.ps1
 ```
 
-### 6. ⏱️ **WICHTIG: Warten Sie 2-3 Minuten!**
+### 5. ⏱️ **WICHTIG: Warten Sie 2-3 Minuten!**
 > **🚨 Das System braucht Zeit für die automatische Installation!**
 > 
 > **Was passiert im Hintergrund:**
@@ -141,7 +131,7 @@ JOOMLA_SITE_NAME=Mein Joomla Projekt
 > docker-compose logs -f joomla
 > ```
 
-### 7. ✅ Fertig!
+### 6. ✅ Fertig!
 - **Projekt-Info:** http://localhost:81
 - **Joomla:** http://localhost:80
 - **phpMyAdmin:** http://localhost:82
@@ -289,7 +279,37 @@ class JConfig {
 # Kopiere joomla/ Ordner an sicheren Ort
 ```
 
-## 🔒 Sicherheitshinweise
+## � Eigenes GitHub-Repository erstellen
+
+Nach der Entwicklung möchten Sie Ihr Projekt wahrscheinlich in einem eigenen GitHub-Repository sichern:
+
+### 🚀 **Automatische Repository-Vorbereitung**
+
+**Gute Nachricht:** Beim ersten `.\start-project.ps1` Aufruf werden automatisch `.git` und `.github` Ordner entfernt!
+
+Ihr Projekt ist dann sofort bereit für ein eigenes Repository:
+
+```powershell
+# Nach dem ersten Start ist Ihr Projekt bereits unabhängig!
+# Erstellen Sie einfach ein neues Git-Repository:
+
+git init
+git add .
+git commit -m "Initial Joomla project"
+
+# Mit eigenem GitHub-Repository verbinden:
+git remote add origin https://github.com/IHR-USERNAME/IHR-PROJEKT.git
+git push -u origin main
+```
+
+### 💾 **Was wird versioniert:**
+- ✅ **Joomla-Dateien** (`joomla/` Ordner) 
+- ✅ **Docker-Konfiguration** (docker-compose.yaml, Dockerfile)
+- ✅ **Scripts** (prepare.ps1, start-project.ps1, export-database.ps1)
+- ❌ **Datenbank-Inhalte** (für Backups: `.\export-database.ps1` verwenden)
+- ❌ **.env Datei** (aus Sicherheitsgründen)
+
+## �🔒 Sicherheitshinweise
 
 ⚠️ **Vor Produktionseinsatz:**
 - Alle Passwörter in `.env` ändern
