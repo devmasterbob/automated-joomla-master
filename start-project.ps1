@@ -122,10 +122,72 @@ foreach ($passwordVar in $passwordVars) {
     }
 }
 
-# Start containers
-Write-Host "🔄 Starting Docker containers..." -ForegroundColor Cyan
-Write-Host "   Project Name: $projectName" -ForegroundColor Gray
-docker-compose up -d
+# Check if database volume exists (indicating existing project)
+$volumeName = "${projectName}_db_data"
+$volumeExists = (docker volume ls -q -f name=$volumeName) -ne $null
+
+if ($volumeExists) {
+    Write-Host "🔍 Existing database volume detected" -ForegroundColor Yellow
+    Write-Host "   Volume: $volumeName" -ForegroundColor Gray
+    Write-Host ""
+    
+    # Start containers first to access database
+    Write-Host "🔄 Starting containers to check database..." -ForegroundColor Cyan
+    docker-compose up -d --quiet-pull
+    
+    # Wait for database to be ready
+    Write-Host "⏳ Waiting for database to start..." -ForegroundColor Gray
+    Start-Sleep -Seconds 10
+    
+    # Check if database contains Joomla content (indicating it's not a fresh install)
+    $hasJoomlaData = $false
+    try {
+        # Try to connect and check for Joomla tables
+        $dbCheck = docker-compose exec -T db mysql -u root -p"$($envVariables['MYSQL_ROOT_PASSWORD'])" -e "USE $($envVariables['MYSQL_DATABASE']); SHOW TABLES LIKE 'joom_%';" 2>$null
+        if ($dbCheck -and $dbCheck.Trim() -ne "") {
+            $hasJoomlaData = $true
+        }
+    }
+    catch {
+        # Database might not be accessible yet, continue with normal startup
+        $hasJoomlaData = $false
+    }
+    
+    if ($hasJoomlaData) {
+        Write-Host "✅ Existing Joomla data found - protecting your content!" -ForegroundColor Green
+        Write-Host "🔐 Updating database passwords to match .env file..." -ForegroundColor Cyan
+        
+        # Update database user password to match .env
+        try {
+            $updatePassword = "ALTER USER '$($envVariables['MYSQL_USER'])'@'%' IDENTIFIED BY '$($envVariables['MYSQL_PASSWORD'])';"
+            $updateRootPassword = "ALTER USER 'root'@'%' IDENTIFIED BY '$($envVariables['MYSQL_ROOT_PASSWORD'])';"
+            
+            # Update the passwords
+            docker-compose exec -T db mysql -u root -p"$($envVariables['MYSQL_ROOT_PASSWORD'])" -e "$updatePassword $updateRootPassword FLUSH PRIVILEGES;" 2>$null
+            Write-Host "✅ Database passwords synchronized with .env file" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "⚠️  Could not update database passwords - using existing ones" -ForegroundColor Yellow
+        }
+        
+        Write-Host "💾 Your Joomla content (articles, menus, settings) is preserved!" -ForegroundColor Green
+        Write-Host ""
+    }
+}
+else {
+    Write-Host "🆕 Fresh installation detected - setting up new project..." -ForegroundColor Green
+}
+
+# Start containers (if not already started for database check)
+if (-not $volumeExists) {
+    Write-Host "🔄 Starting Docker containers..." -ForegroundColor Cyan
+    Write-Host "   Project Name: $projectName" -ForegroundColor Gray
+    docker-compose up -d
+}
+else {
+    Write-Host "🔄 Ensuring all containers are running..." -ForegroundColor Cyan
+    docker-compose up -d --quiet-pull
+}
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
