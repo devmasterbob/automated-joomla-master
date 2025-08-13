@@ -1,0 +1,19 @@
+#!/bin/bash
+# Git pre-commit hook to protect .env-example
+
+echo "🔒 Checking .env-example before commit..."
+
+if [ -f ".env-example" ]; then
+    if grep -q "PROJECT_NAME=\${CURRENT_FOLDER}" ".env-example"; then
+        echo "✅ .env-example is protected"
+        exit 0
+    else
+        echo "❌ ERROR: .env-example is corrupted!"
+        echo "   PROJECT_NAME must be: \${CURRENT_FOLDER}"
+        echo "   Run: .\check-env-example.ps1 to fix"
+        exit 1
+    fi
+else
+    echo "❌ ERROR: .env-example not found!"
+    exit 1
+fi

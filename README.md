@@ -339,6 +339,13 @@ We welcome contributions from the global community!
 - 🚀 **New features** and optimizations
 - 🎨 **UI/UX** improvements for Landing Page
 
+### ⚠️ **Developer Note**
+
+Before committing, ensure `.env-example` contains `PROJECT_NAME=${CURRENT_FOLDER}`:
+```powershell
+.\check-env-example.ps1  # Quick protection check
+```
+
 ## ⭐ Show Your Support
 
 If this project helped you save time and effort:

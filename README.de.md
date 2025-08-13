@@ -23,34 +23,33 @@ cd my-joomla-project
 # Open: http://localhost:81 🎉
 ```
 
-## ⭐ **Why Choose Automated Joomla Master?**
+## ⭐ **Warum Automated Joomla Master wählen?**
 
-**Problem:** Manual Joomla setup is time-consuming and error-prone  
-**Solution:** Complete automation with professional development workflow
+**Problem:** Manuelle Joomla-Installation ist zeitaufwändig und fehleranfällig  
+**Lösung:** Komplette Automatisierung mit professionellem Entwicklungsworkflow
 
-| Traditional Setup | Automated Joomla Master |
-|-------------------|-------------------------|
-| 🕐 30+ minutes manual configuration | ⚡ 3 minutes fully automated |
-| 🐛 Error-prone browser setup | ✅ Zero-error installation |
-| 📝 Complex documentation reading | 🎯 One command to rule them all |
-| 🔧 Manual database setup | 🚀 Everything pre-configured |
+| Traditionelle Installation | Automated Joomla Master |
+|---------------------------|-------------------------|
+| 🕐 30+ Minuten manuelle Konfiguration | ⚡ 3 Minuten vollautomatisch |
+| 🐛 Fehleranfällige Browser-Installation | ✅ Null-Fehler-Installation |
+| 📝 Komplexe Dokumentation lesen | 🎯 Ein Befehl für alles |
+| 🔧 Manuelle Datenbank-Einrichtung | 🚀 Alles vorkonfiguriert |
 
-## 🌟 Key Features
+## 🌟 Hauptfeatures
 
-- ✅ **Fully Automated Joomla Installation** - zero manual browser setup
-- ✅ **4-Container Architecture** - Landing Page + Joomla 5 + MySQL 8.0 + phpMyAdmin  
-- ✅ **Interactive Development History** - Complete project documentation in Landing Page
-- ✅ **Provider Deployment Tools** - One-click database export for production
-- ✅ **VS Code Integration** - Professional development workflow  
-- ✅ **Environment-based Configuration** - All settings in .env file
-- ✅ **Production-Ready Optimizations** (OPcache, Apache modules)
-- ✅ **Multiple Complexity Levels** - Choose your version
+- ✅ **Vollautomatische Joomla-Installation** - Keine manuelle Browser-Installation
+- ✅ **4-Container-Architektur** - Landing Page + Joomla 5 + MySQL 8.0 + phpMyAdmin  
+- ✅ **Interaktive Entwicklungshistorie** - Komplette Projektdokumentation in der Landing Page
+- ✅ **Provider-Deployment-Tools** - Ein-Klick-Datenbankexport für Produktion
+- ✅ **VS Code Integration** - Professioneller Entwicklungsworkflow  
+- ✅ **Umgebungsbasierte Konfiguration** - Alle Einstellungen in .env-Datei
+- ✅ **Produktionsreife Optimierungen** (OPcache, Apache-Module)
 
-## 🎯 Available Versions
+## 🎯 Verfügbare Versionen
 
-| Branch | Description | Components |
-|--------|-------------|------------|
-| **`main`** | **Complete Version** (recommended) | Landing Page + Joomla + MySQL + phpMyAdmin + Full Automation |
+| Branch | Beschreibung | Komponenten |
+|--------|-------------|-------------|
+| **`main`** | **Komplette Version** (empfohlen) | Landing Page + Joomla + MySQL + phpMyAdmin + Vollautomatisierung |
 
 ## 🚀 Schnellstart für neue Projekte
 
@@ -387,50 +386,56 @@ docker-compose exec joomla mysql -h db -u joomla -p
 - **Mindestens 4GB RAM** für alle Container
 - **Windows 10/11** mit WSL2 oder **Linux/macOS**
 
-## 🤝 Contributing
+## 🤝 Mitwirken
 
-We welcome contributions! Here's how you can help:
+Wir begrüßen Beiträge! So können Sie helfen:
 
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b amazing-feature`
-3. **Commit** your changes: `git commit -am 'Add amazing feature'`
-4. **Push** to the branch: `git push origin amazing-feature`
-5. **Open** a Pull Request
+1. **Repository forken**
+2. **Feature-Branch erstellen:** `git checkout -b neues-feature`
+3. **Änderungen committen:** `git commit -am 'Neues Feature hinzufügen'`
+4. **Branch pushen:** `git push origin neues-feature`
+5. **Pull Request erstellen**
 
-### 🎯 Areas where we need help:
-- 📚 Documentation improvements
-- 🐛 Bug fixes and testing
-- 🌐 Translations
-- 🚀 New features and optimizations
+### 🎯 Bereiche, wo wir Hilfe brauchen:
+- 📚 Dokumentationsverbesserungen
+- 🐛 Fehlerbehebungen und Tests
+- 🌐 Übersetzungen
+- 🚀 Neue Features und Optimierungen
 
-## ⭐ Show Your Support
+### ⚠️ **Entwicklerhinweis:**
+Vor dem Committen sicherstellen, dass `.env-example` `PROJECT_NAME=${CURRENT_FOLDER}` enthält:
+```powershell
+.\check-env-example.ps1  # Schneller Schutz-Check
+```
 
-If this project helped you, please consider:
-- ⭐ **Starring** the repository
-- 🐛 **Reporting** issues
-- 💡 **Suggesting** new features
-- 🗣️ **Sharing** with the Joomla community
+## ⭐ Unterstützen Sie uns
 
-## 📄 License
+Wenn dieses Projekt Ihnen geholfen hat, denken Sie bitte daran:
+- ⭐ **Repository sternen**
+- 🐛 **Issues melden**
+- 💡 **Neue Features vorschlagen**
+- 🗣️ **Mit der Joomla-Community teilen**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 📄 Lizenz
 
-## 🙏 Acknowledgments
+Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE) Datei für Details.
 
-- **Joomla Community** for the amazing CMS
-- **Docker Team** for containerization technology
-- **All Contributors** who help improve this project
+## 🙏 Danksagungen
+
+- **Joomla-Community** für das großartige CMS
+- **Docker-Team** für die Containerisierungstechnologie
+- **Alle Mitwirkenden**, die helfen, dieses Projekt zu verbessern
 
 ## 🆘 Support & Community
 
-- 📚 **Documentation:** Check our comprehensive guides above
+- 📚 **Dokumentation:** Schauen Sie sich unsere umfassenden Anleitungen oben an
 - 🐛 **Issues:** [GitHub Issues](https://github.com/devmasterbob/automated-joomla-master/issues)
-- 💬 **Discussions:** [GitHub Discussions](https://github.com/devmasterbob/automated-joomla-master/discussions)
-- 📧 **Contact:** Open an issue for any questions
+- 💬 **Diskussionen:** [GitHub Discussions](https://github.com/devmasterbob/automated-joomla-master/discussions)
+- 📧 **Kontakt:** Öffnen Sie ein Issue bei Fragen
 
 ---
 
-**Made with ❤️ for the Joomla community** | **Star ⭐ if this project helped you!**
+**Made with ❤️ für die Joomla-Community** | **Star ⭐ wenn dieses Projekt Ihnen geholfen hat!**
 2. GitHub Issues verwenden
 3. Logs immer mit anhängen: `docker-compose logs`
 
