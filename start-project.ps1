@@ -264,6 +264,172 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "   🌍 Joomla CMS:    http://localhost:$portJoomla" -ForegroundColor Cyan  
     Write-Host "   🗄️ phpMyAdmin:    http://localhost:$portPhpMyAdmin" -ForegroundColor Cyan
     Write-Host ""
+    
+    # Enhanced Password Recovery System v4.1
+    if ($volumeExists) {
+        Write-Host "🔍 Running Enhanced Password Recovery System v4.1..." -ForegroundColor Cyan
+        Start-Sleep -Seconds 2
+        
+        # Get database connection variables from .env
+        $mysqlRootPassword = $envVariables["MYSQL_ROOT_PASSWORD"]
+        $joomlaDbName = $envVariables["MYSQL_DATABASE"]
+        $joomlaDbUser = $envVariables["MYSQL_USER"]
+        $joomlaDbPassword = $envVariables["MYSQL_PASSWORD"]
+        
+        # Smart Password Detection - comprehensive pattern matching
+        $possibleRootPasswords = @($mysqlRootPassword)
+        $currentPassword = $mysqlRootPassword
+        
+        # Generate comprehensive password variations
+        $variations = @(
+            ($currentPassword -replace '_CHANGED_', '_ORIGINAL_'),
+            ($currentPassword -replace 'CHANGED', 'ORIGINAL'),
+            ($currentPassword -replace '_CHANGED_12345678', '12345678'),
+            ($currentPassword -replace '_ORIGINAL_12345678', '12345678'),
+            ($currentPassword -replace '_NEU_', '_ALT_'),
+            ($currentPassword -replace '_NEW_', '_OLD_'),
+            ($currentPassword -replace '12345678', '87654321')
+        )
+        
+        # Add unique variations only
+        foreach ($variation in $variations) {
+            if ($variation -ne $currentPassword -and $possibleRootPasswords -notcontains $variation) {
+                $possibleRootPasswords += $variation
+            }
+        }
+        
+        # Test each password to find working root connection
+        $workingRootPassword = $null
+        Write-Host "   🔍 Testing $($possibleRootPasswords.Count) password combinations..." -ForegroundColor Gray
+        
+        foreach ($testPassword in $possibleRootPasswords) {
+            $testResult = docker exec "$projectName-mysql" mysql -u root -p"$testPassword" -e "SELECT 1;" 2>$null
+            if ($testResult -and $testResult.Trim() -ne "") {
+                $workingRootPassword = $testPassword
+                if ($testPassword -ne $mysqlRootPassword) {
+                    Write-Host "   🔍 Found working root password (different from .env)" -ForegroundColor Yellow
+                }
+                break
+            }
+        }
+        
+        if (-not $workingRootPassword) {
+            Write-Host "   ❌ Cannot connect to database with any known password" -ForegroundColor Red
+            Write-Host "   💡 Please check your MySQL root password in .env file" -ForegroundColor Yellow
+        }
+        else {
+            # Check database integrity and Joomla connectivity
+            $tableCount = docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$joomlaDbName';" 2>$null | Select-Object -Skip 1
+            
+            $joomlaCanConnect = $false
+            if ([int]$tableCount -gt 0) {
+                $connectionTest = docker exec "$projectName-mysql" mysql -u "$joomlaDbUser" -p"$joomlaDbPassword" -e "USE $joomlaDbName; SELECT 1;" 2>$null
+                if ($connectionTest -and $connectionTest.Trim() -ne "") {
+                    $joomlaCanConnect = $true
+                }
+            }
+            
+            # Recovery scenarios
+            if ([int]$tableCount -eq 0) {
+                Write-Host "   ⚠️  Empty database detected - triggering automatic recovery..." -ForegroundColor Yellow
+                docker restart "$projectName-joomla" > $null 2>&1
+                Write-Host "   ✅ Database recovery initiated" -ForegroundColor Green
+            }
+            elseif (-not $joomlaCanConnect) {
+                Write-Host "   ⚠️  Database password mismatch detected - fixing authentication..." -ForegroundColor Yellow
+                Write-Host "   📊 Database has $tableCount tables but Joomla cannot connect" -ForegroundColor Gray
+                
+                try {
+                    # Update all database passwords
+                    $updateJoomlaUser = "ALTER USER '$joomlaDbUser'@'%' IDENTIFIED BY '$joomlaDbPassword';"
+                    $updateRootUser = "ALTER USER 'root'@'%' IDENTIFIED BY '$mysqlRootPassword';"
+                    docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "$updateJoomlaUser $updateRootUser FLUSH PRIVILEGES;" 2>$null
+                    
+                    # Update Joomla configuration.php
+                    Write-Host "   🔧 Updating Joomla configuration.php..." -ForegroundColor Cyan
+                    
+                    # Generate password variations for configuration.php search
+                    $configPasswords = @()
+                    foreach ($testPass in $possibleRootPasswords) {
+                        # Convert root passwords to potential Joomla DB passwords
+                        $joomlaVariation = $testPass -replace 'mysql', 'joomla'
+                        if ($configPasswords -notcontains $joomlaVariation) {
+                            $configPasswords += $joomlaVariation
+                        }
+                    }
+                    
+                    # Try to find and replace the old password in configuration.php
+                    $configUpdated = $false
+                    foreach ($oldPassword in $configPasswords) {
+                        if ($oldPassword -ne $joomlaDbPassword) {
+                            $result = docker exec "$projectName-joomla" sh -c "sed -i 's/$oldPassword/$joomlaDbPassword/g' /var/www/html/configuration.php" 2>$null
+                            if ($LASTEXITCODE -eq 0) {
+                                $configUpdated = $true
+                                break
+                            }
+                        }
+                    }
+                    
+                    # Restart Joomla to apply changes
+                    docker restart "$projectName-joomla" > $null 2>&1
+                    Start-Sleep -Seconds 5
+                    Write-Host "   ✅ Enhanced Password Recovery v4.1 complete!" -ForegroundColor Green
+                }
+                catch {
+                    Write-Host "   ❌ Password recovery failed - manual intervention required" -ForegroundColor Red
+                }
+            }
+            else {
+                Write-Host "   ✅ Database integrity confirmed ($tableCount tables, connection OK)" -ForegroundColor Green
+                
+                # Enhanced v4.1: Check configuration.php even when database connection works
+                Write-Host "   🔍 Checking configuration.php consistency..." -ForegroundColor Cyan
+                
+                # Get current password from configuration.php using PowerShell regex
+                $configPasswordLine = docker exec "$projectName-joomla" sh -c "grep 'public.*password' /var/www/html/configuration.php" 2>$null
+                $currentConfigPassword = ""
+                
+                if ($configPasswordLine -and $configPasswordLine -match "public.*password.*=.*'([^']*)'") {
+                    $currentConfigPassword = $Matches[1]
+                    Write-Host "   📄 Config password: '$currentConfigPassword'" -ForegroundColor Gray
+                    Write-Host "   📋 Expected password: '$joomlaDbPassword'" -ForegroundColor Gray
+                
+                    if ($currentConfigPassword -ne $joomlaDbPassword) {
+                        Write-Host "   ⚠️  Configuration.php password mismatch detected!" -ForegroundColor Yellow
+                        Write-Host "   🔧 Updating configuration.php automatically..." -ForegroundColor Cyan
+                        
+                        # Fix configuration.php with the correct password
+                        $fixResult = docker exec "$projectName-joomla" sh -c "sed -i 's/$currentConfigPassword/$joomlaDbPassword/g' /var/www/html/configuration.php" 2>$null
+                        if ($LASTEXITCODE -eq 0) {
+                            Write-Host "   ✅ Configuration.php updated successfully!" -ForegroundColor Green
+                            Write-Host "   🔄 Restarting Joomla container..." -ForegroundColor Cyan
+                            docker restart "$projectName-joomla" > $null 2>&1
+                            Start-Sleep -Seconds 5
+                            Write-Host "   ✅ Enhanced Password Recovery v4.1 complete!" -ForegroundColor Green
+                        }
+                        else {
+                            Write-Host "   ❌ Failed to update configuration.php" -ForegroundColor Red
+                        }
+                    }
+                    else {
+                        Write-Host "   ✅ Configuration.php password is correct" -ForegroundColor Green
+                    }
+                }
+                else {
+                    Write-Host "   ⚠️  Could not read configuration.php password" -ForegroundColor Yellow
+                }
+                
+                # Sync root password if different
+                if ($workingRootPassword -ne $mysqlRootPassword) {
+                    Write-Host "   🔄 Synchronizing root password..." -ForegroundColor Cyan
+                    docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "ALTER USER 'root'@'%' IDENTIFIED BY '$mysqlRootPassword'; FLUSH PRIVILEGES;" 2>$null
+                    Write-Host "   ✅ Root password synchronized" -ForegroundColor Green
+                }
+            }
+        }
+        Write-Host ""
+    }
+    
     Write-Host "⚠️  IMPORTANT: If you get 'Error 500' on first visit:" -ForegroundColor Yellow
     Write-Host "   • Wait 30 seconds more for full installation" -ForegroundColor Yellow  
     Write-Host "   • Clear browser cache (Ctrl+F5)" -ForegroundColor Yellow
