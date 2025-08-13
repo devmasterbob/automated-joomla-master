@@ -265,16 +265,18 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "   🗄️ phpMyAdmin:    http://localhost:$portPhpMyAdmin" -ForegroundColor Cyan
     Write-Host ""
     
-    # Enhanced Password Recovery System v4.1
+    # Enhanced Configuration Sync System v4.2
     if ($volumeExists) {
-        Write-Host "🔍 Running Enhanced Password Recovery System v4.1..." -ForegroundColor Cyan
+        Write-Host "� Running Enhanced Configuration Sync System v4.2..." -ForegroundColor Cyan
         Start-Sleep -Seconds 2
         
-        # Get database connection variables from .env
+        # Get configuration variables from .env
         $mysqlRootPassword = $envVariables["MYSQL_ROOT_PASSWORD"]
         $joomlaDbName = $envVariables["MYSQL_DATABASE"]
         $joomlaDbUser = $envVariables["MYSQL_USER"]
         $joomlaDbPassword = $envVariables["MYSQL_PASSWORD"]
+        $joomlaSiteName = $envVariables["JOOMLA_SITE_NAME"]
+        $joomlaAdminEmail = $envVariables["JOOMLA_ADMIN_EMAIL"]
         
         # Smart Password Detection - comprehensive pattern matching
         $possibleRootPasswords = @($mysqlRootPassword)
@@ -373,7 +375,7 @@ if ($LASTEXITCODE -eq 0) {
                     # Restart Joomla to apply changes
                     docker restart "$projectName-joomla" > $null 2>&1
                     Start-Sleep -Seconds 5
-                    Write-Host "   ✅ Enhanced Password Recovery v4.1 complete!" -ForegroundColor Green
+                    Write-Host "   ✅ Enhanced Configuration Sync v4.2 password recovery complete!" -ForegroundColor Green
                 }
                 catch {
                     Write-Host "   ❌ Password recovery failed - manual intervention required" -ForegroundColor Red
@@ -382,41 +384,63 @@ if ($LASTEXITCODE -eq 0) {
             else {
                 Write-Host "   ✅ Database integrity confirmed ($tableCount tables, connection OK)" -ForegroundColor Green
                 
-                # Enhanced v4.1: Check configuration.php even when database connection works
-                Write-Host "   🔍 Checking configuration.php consistency..." -ForegroundColor Cyan
+                # Enhanced v4.2: Comprehensive Configuration Sync
+                Write-Host "   🔍 Running comprehensive configuration sync..." -ForegroundColor Cyan
                 
-                # Get current password from configuration.php using PowerShell regex
+                $configChanges = 0
+                
+                # 1. Password Sync (from v4.1)
                 $configPasswordLine = docker exec "$projectName-joomla" sh -c "grep 'public.*password' /var/www/html/configuration.php" 2>$null
-                $currentConfigPassword = ""
-                
                 if ($configPasswordLine -and $configPasswordLine -match "public.*password.*=.*'([^']*)'") {
                     $currentConfigPassword = $Matches[1]
-                    Write-Host "   📄 Config password: '$currentConfigPassword'" -ForegroundColor Gray
-                    Write-Host "   📋 Expected password: '$joomlaDbPassword'" -ForegroundColor Gray
-                
                     if ($currentConfigPassword -ne $joomlaDbPassword) {
-                        Write-Host "   ⚠️  Configuration.php password mismatch detected!" -ForegroundColor Yellow
-                        Write-Host "   🔧 Updating configuration.php automatically..." -ForegroundColor Cyan
-                        
-                        # Fix configuration.php with the correct password
-                        $fixResult = docker exec "$projectName-joomla" sh -c "sed -i 's/$currentConfigPassword/$joomlaDbPassword/g' /var/www/html/configuration.php" 2>$null
-                        if ($LASTEXITCODE -eq 0) {
-                            Write-Host "   ✅ Configuration.php updated successfully!" -ForegroundColor Green
-                            Write-Host "   🔄 Restarting Joomla container..." -ForegroundColor Cyan
-                            docker restart "$projectName-joomla" > $null 2>&1
-                            Start-Sleep -Seconds 5
-                            Write-Host "   ✅ Enhanced Password Recovery v4.1 complete!" -ForegroundColor Green
-                        }
-                        else {
-                            Write-Host "   ❌ Failed to update configuration.php" -ForegroundColor Red
-                        }
-                    }
-                    else {
-                        Write-Host "   ✅ Configuration.php password is correct" -ForegroundColor Green
+                        Write-Host "   ⚠️  Password mismatch detected - updating..." -ForegroundColor Yellow
+                        docker exec "$projectName-joomla" sh -c "sed -i 's/$currentConfigPassword/$joomlaDbPassword/g' /var/www/html/configuration.php" 2>$null
+                        $configChanges++
                     }
                 }
+                
+                # 2. Site Name Sync (NEW in v4.2)
+                if ($joomlaSiteName) {
+                    $configSiteNameLine = docker exec "$projectName-joomla" sh -c "grep 'public.*sitename' /var/www/html/configuration.php" 2>$null
+                    if ($configSiteNameLine -and $configSiteNameLine -match "public.*sitename.*=.*'([^']*)'") {
+                        $currentSiteName = $Matches[1]
+                        if ($currentSiteName -ne $joomlaSiteName) {
+                            Write-Host "   🏠 Site name mismatch detected - updating..." -ForegroundColor Yellow
+                            Write-Host "      From: '$currentSiteName'" -ForegroundColor Gray
+                            Write-Host "      To: '$joomlaSiteName'" -ForegroundColor Gray
+                            docker exec "$projectName-joomla" sh -c "sed -i 's/$currentSiteName/$joomlaSiteName/g' /var/www/html/configuration.php" 2>$null
+                            
+                            # Also update in Joomla database
+                            $updateSiteNameQuery = "UPDATE joom_extensions SET params = REPLACE(params, '\"sitename\":\"$currentSiteName\"', '\"sitename\":\"$joomlaSiteName\"') WHERE element = 'com_config';"
+                            docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "USE $joomlaDbName; $updateSiteNameQuery" 2>$null
+                            $configChanges++
+                        }
+                    }
+                }
+                
+                # 3. Admin Email Sync (NEW in v4.2) 
+                if ($joomlaAdminEmail) {
+                    $currentAdminEmail = docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "USE $joomlaDbName; SELECT email FROM joom_users WHERE id = 1;" 2>$null | Select-Object -Skip 1
+                    if ($currentAdminEmail -and $currentAdminEmail.Trim() -ne $joomlaAdminEmail) {
+                        Write-Host "   📧 Admin email mismatch detected - updating..." -ForegroundColor Yellow
+                        Write-Host "      From: '$($currentAdminEmail.Trim())'" -ForegroundColor Gray
+                        Write-Host "      To: '$joomlaAdminEmail'" -ForegroundColor Gray
+                        $updateEmailQuery = "UPDATE joom_users SET email = '$joomlaAdminEmail' WHERE id = 1;"
+                        docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "USE $joomlaDbName; $updateEmailQuery" 2>$null
+                        $configChanges++
+                    }
+                }
+                
+                # Apply changes if any were made
+                if ($configChanges -gt 0) {
+                    Write-Host "   🔄 Restarting Joomla to apply $configChanges configuration changes..." -ForegroundColor Cyan
+                    docker restart "$projectName-joomla" > $null 2>&1
+                    Start-Sleep -Seconds 5
+                    Write-Host "   ✅ Enhanced Configuration Sync v4.2 complete!" -ForegroundColor Green
+                }
                 else {
-                    Write-Host "   ⚠️  Could not read configuration.php password" -ForegroundColor Yellow
+                    Write-Host "   ✅ All configurations are already synchronized" -ForegroundColor Green
                 }
                 
                 # Sync root password if different
