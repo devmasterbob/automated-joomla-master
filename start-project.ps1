@@ -436,20 +436,40 @@ if ($LASTEXITCODE -eq 0) {
                 
                 # Apply changes if any were made
                 if ($configChanges -gt 0) {
-                    Write-Host "   🔄 Restarting Joomla to apply $configChanges configuration changes..." -ForegroundColor Cyan
+                    Write-Host "   🔄 Restarting ALL containers to apply $configChanges configuration changes..." -ForegroundColor Cyan
+                    # Restart all relevant containers
+                    docker restart "$projectName-mysql" > $null 2>&1
                     docker restart "$projectName-joomla" > $null 2>&1
-                    Start-Sleep -Seconds 5
+                    docker restart "$projectName-phpmyadmin" > $null 2>&1
+                    Start-Sleep -Seconds 8
                     Write-Host "   ✅ Enhanced Configuration Sync v4.2 complete!" -ForegroundColor Green
                 }
                 else {
                     Write-Host "   ✅ All configurations are already synchronized" -ForegroundColor Green
                 }
-                
-                # Sync root password if different
-                if ($workingRootPassword -ne $mysqlRootPassword) {
-                    Write-Host "   🔄 Synchronizing root password..." -ForegroundColor Cyan
-                    docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "ALTER USER 'root'@'%' IDENTIFIED BY '$mysqlRootPassword'; FLUSH PRIVILEGES;" 2>$null
-                    Write-Host "   ✅ Root password synchronized" -ForegroundColor Green
+
+                # Always sync MySQL users (root + joomla)
+                Write-Host "   🔄 Synchronizing MySQL users..." -ForegroundColor Cyan
+                $alterRoot = "ALTER USER 'root'@'%' IDENTIFIED BY '$mysqlRootPassword';"
+                $alterJoomla = "ALTER USER '$joomlaDbUser'@'%' IDENTIFIED BY '$joomlaDbPassword';"
+                docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "$alterRoot $alterJoomla FLUSH PRIVILEGES;" 2>$null
+                Start-Sleep -Seconds 2
+                Write-Host "   ✅ MySQL users synchronized" -ForegroundColor Green
+
+                # Test DB connection after sync
+                $testRoot = docker exec "$projectName-mysql" mysql -u root -p"$mysqlRootPassword" -e "SELECT 1;" 2>$null
+                $testJoomla = docker exec "$projectName-mysql" mysql -u "$joomlaDbUser" -p"$joomlaDbPassword" -e "USE $joomlaDbName; SELECT 1;" 2>$null
+                if ($testRoot -and $testRoot.Trim() -ne "") {
+                    Write-Host "   ✅ MySQL root connection test: OK" -ForegroundColor Green
+                }
+                else {
+                    Write-Host "   ❌ MySQL root connection test: FAILED" -ForegroundColor Red
+                }
+                if ($testJoomla -and $testJoomla.Trim() -ne "") {
+                    Write-Host "   ✅ Joomla DB user connection test: OK" -ForegroundColor Green
+                }
+                else {
+                    Write-Host "   ❌ Joomla DB user connection test: FAILED" -ForegroundColor Red
                 }
             }
         }
