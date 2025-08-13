@@ -411,8 +411,10 @@ if ($LASTEXITCODE -eq 0) {
                             Write-Host "      To: '$joomlaSiteName'" -ForegroundColor Gray
                             docker exec "$projectName-joomla" sh -c "sed -i 's/$currentSiteName/$joomlaSiteName/g' /var/www/html/configuration.php" 2>$null
                             
-                            # Also update in Joomla database
-                            $updateSiteNameQuery = "UPDATE joom_extensions SET params = REPLACE(params, '\"sitename\":\"$currentSiteName\"', '\"sitename\":\"$joomlaSiteName\"') WHERE element = 'com_config';"
+                            # Also update in Joomla database - fixed escaping
+                            $oldSiteJson = '\"sitename\":\"' + $currentSiteName + '\"'
+                            $newSiteJson = '\"sitename\":\"' + $joomlaSiteName + '\"'
+                            $updateSiteNameQuery = "UPDATE joom_extensions SET params = REPLACE(params, '$oldSiteJson', '$newSiteJson') WHERE element = 'com_config';"
                             docker exec "$projectName-mysql" mysql -u root -p"$workingRootPassword" -e "USE $joomlaDbName; $updateSiteNameQuery" 2>$null
                             $configChanges++
                         }
