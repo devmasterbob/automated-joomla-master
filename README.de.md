@@ -92,12 +92,17 @@ cp .env-example .env
 
 ```env
 # PROJECT_NAME wird automatisch durch prepare.ps1 gesetzt und muss nicht manuell geändert werden!
-PROJECT_NAME=mein-neues-projekt
+PROJECT_NAME=${CURRENT_FOLDER}
 
 # Sicherheit: Eigene Passwörter verwenden (mindestens 12 Zeichen, keine Sonderzeichen wie $ ` " ' \ §)
-MYSQL_PASSWORD=mysql12345678
-MYSQL_ROOT_PASSWORD=mysql12345678
 JOOMLA_ADMIN_PASSWORD=admin12345678
+JOOMLA_DB_PASSWORD=joomla12345678
+MYSQL_ROOT_PASSWORD=mysql12345678
+JOOMLA_ADMIN_USERNAME=admin
+
+# Optional:
+JOOMLA_SITE_NAME=My Joomla Project
+JOOMLA_ADMIN_EMAIL=admin@mydomain.com
 ```
 
 **⚠️ WICHTIG:** Bitte immer das Script `.\prepare.ps1` verwenden! Nur so wird PROJECT_NAME korrekt gesetzt und das Docker-System funktioniert zuverlässig. Eine manuelle Anpassung der .env kann zu Problemen mit den Containern führen.
@@ -131,12 +136,12 @@ Das System installiert Joomla und richtet die Datenbank automatisch ein.
 
 ### Standard-Zugangsdaten
 - **Joomla Admin:** 
-  - Benutzername: `joomla` (aus .env: MYSQL_USER)
-  - Passwort: `joomla@secured` (aus .env: JOOMLA_ADMIN_PASSWORD)
+  - Benutzername: `admin` (aus .env: JOOMLA_ADMIN_USERNAME)
+  - Passwort: `admin12345678` (aus .env: JOOMLA_ADMIN_PASSWORD)
 
 - **phpMyAdmin:**
   - Benutzername: `root`
-  - Passwort: `rootpass` (aus .env: MYSQL_ROOT_PASSWORD)
+  - Passwort: `mysql12345678` (aus .env: MYSQL_ROOT_PASSWORD)
 
 ## 📁 Projektstruktur
 
