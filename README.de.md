@@ -91,16 +91,18 @@ cp .env-example .env
 Ändern Sie in der `.env` Datei mindestens:
 
 ```env
-# MUSS geändert werden - Name des Projektordners verwenden:
+# PROJECT_NAME wird automatisch durch prepare.ps1 gesetzt und muss nicht manuell geändert werden!
 PROJECT_NAME=mein-neues-projekt
 
-# Sicherheit - eigene Passwörter verwenden (mindestens 12 Zeichen!):
+# Sicherheit: Eigene Passwörter verwenden (mindestens 12 Zeichen, keine Sonderzeichen wie $ ` " ' \ §)
 MYSQL_PASSWORD=mysql12345678
 MYSQL_ROOT_PASSWORD=mysql12345678
 JOOMLA_ADMIN_PASSWORD=admin12345678
 ```
 
-**⚠️ WICHTIG:** Alle Passwörter müssen **mindestens 12 Zeichen** lang sein, sonst schlägt die automatische Installation fehl!
+**⚠️ WICHTIG:** Bitte immer das Script `.\prepare.ps1` verwenden! Nur so wird PROJECT_NAME korrekt gesetzt und das Docker-System funktioniert zuverlässig. Eine manuelle Anpassung der .env kann zu Problemen mit den Containern führen.
+
+**Passwort-Hinweis:** Alle Passwörter müssen **mindestens 12 Zeichen** lang sein, sonst schlägt die automatische Installation fehl!
 ```
 ### ⚠️ Datenbank-Einstellungen nach Erstinstallation
 
