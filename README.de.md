@@ -103,24 +103,20 @@ JOOMLA_ADMIN_PASSWORD=admin12345678
 **⚠️ WICHTIG:** Bitte immer das Script `.\prepare.ps1` verwenden! Nur so wird PROJECT_NAME korrekt gesetzt und das Docker-System funktioniert zuverlässig. Eine manuelle Anpassung der .env kann zu Problemen mit den Containern führen.
 
 **Passwort-Hinweis:** Alle Passwörter müssen **mindestens 12 Zeichen** lang sein, sonst schlägt die automatische Installation fehl!
+
+---
+
+### System starten
+
+Im VS Code Terminal:
+```powershell
+.\start-project.ps1
 ```
-### ⚠️ Datenbank-Einstellungen nach Erstinstallation
 
-Nach der Erstinstallation sind alle Datenbank-Variablen (`MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD`, `MYSQL_USER`, `MYSQL_DATABASE`) gesperrt und können nicht mehr über die `.env` geändert werden. Änderungen werden ignoriert und eine Warnung ausgegeben. Nur Joomla-Einstellungen (Admin-Passwort, Site Name, Admin Email) und Ports können sicher geändert werden.
+**⏱️ Warten Sie 2-3 Minuten!**
+Das System installiert Joomla und richtet die Datenbank automatisch ein.
 
-Wenn Sie Datenbank-Einstellungen ändern möchten, führen Sie eine Neuinstallation durch (Datenbank-Volume entfernen und Projekt neu starten).
-> - Joomla wird vollständig installiert
-> - Installation-Verzeichnis wird automatisch entfernt
-> 
-> **Bitte haben Sie Geduld!** Öffnen Sie http://localhost:80 erst nach **2-3 Minuten**.
-> 
-> **Status prüfen:**
-> ```bash
-> # Container-Logs verfolgen (optional):
-> docker-compose logs -f joomla
-> ```
-
-### 6. ✅ Fertig!
+**Fertig!**
 - **Projekt-Info:** http://localhost:81
 - **Joomla:** http://localhost:80
 - **phpMyAdmin:** http://localhost:82
