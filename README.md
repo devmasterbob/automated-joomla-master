@@ -1,6 +1,4 @@
-# Optional customization:
-
-### ⚠️ Database Settings After First Installation
+# ⚠️ Database Settings After First Installation
 
 After the initial setup, all database-related variables (`MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD`, `MYSQL_USER`, `MYSQL_DATABASE`) are locked and cannot be changed via `.env`. Any changes to these variables will be ignored and a warning will be shown. Only Joomla settings (admin password, site name, admin email) and ports can be changed safely.
 
@@ -175,9 +173,14 @@ docker-compose up -d
 - **MySQL:** Port 3306 (internal)
 
 ### Default Credentials
+
 - **Joomla Admin:** 
-  - Username: `joomla` (from .env: MYSQL_USER)
-  - Password: `joomla@secured` (from .env: JOOMLA_ADMIN_PASSWORD)
+  - Username: `admin` (from .env: JOOMLA_ADMIN_USERNAME)
+  - Password: `admin12345678` (from .env: JOOMLA_ADMIN_PASSWORD)
+
+- **phpMyAdmin:**
+  - Username: `root`
+  - Password: `mysql12345678` (from .env: MYSQL_ROOT_PASSWORD)
 
 - **phpMyAdmin:**
   - Username: `root`
