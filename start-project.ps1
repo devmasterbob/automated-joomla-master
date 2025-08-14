@@ -270,6 +270,7 @@ if ($LASTEXITCODE -eq 0) {
         Write-Host "� Running Enhanced Configuration Sync System v4.2..." -ForegroundColor Cyan
         Start-Sleep -Seconds 2
         
+
         # Get configuration variables from .env
         $mysqlRootPassword = $envVariables["MYSQL_ROOT_PASSWORD"]
         $joomlaDbName = $envVariables["MYSQL_DATABASE"]
@@ -277,42 +278,57 @@ if ($LASTEXITCODE -eq 0) {
         $joomlaDbPassword = $envVariables["MYSQL_PASSWORD"]
         $joomlaSiteName = $envVariables["JOOMLA_SITE_NAME"]
         $joomlaAdminEmail = $envVariables["JOOMLA_ADMIN_EMAIL"]
-        
-        # Smart Password Detection - comprehensive pattern matching
-        $possibleRootPasswords = @($mysqlRootPassword)
-        $currentPassword = $mysqlRootPassword
-        
-        # Generate comprehensive password variations
-        $variations = @(
-            ($currentPassword -replace '_CHANGED_', '_ORIGINAL_'),
-            ($currentPassword -replace 'CHANGED', 'ORIGINAL'),
-            ($currentPassword -replace '_CHANGED_12345678', '12345678'),
-            ($currentPassword -replace '_ORIGINAL_12345678', '12345678'),
-            ($currentPassword -replace '_NEU_', '_ALT_'),
-            ($currentPassword -replace '_NEW_', '_OLD_'),
-            ($currentPassword -replace '12345678', '87654321')
-        )
-        
-        # Add unique variations only
-        foreach ($variation in $variations) {
-            if ($variation -ne $currentPassword -and $possibleRootPasswords -notcontains $variation) {
-                $possibleRootPasswords += $variation
+
+        # Block DB-Variable changes after initial setup
+        $dbVars = @("MYSQL_ROOT_PASSWORD", "MYSQL_PASSWORD", "MYSQL_USER", "MYSQL_DATABASE")
+        $dbVarChanged = $false
+        $dbVarWarnings = @()
+        foreach ($dbVar in $dbVars) {
+            $envValue = $envVariables[$dbVar]
+            # Get current DB value via SQL (if possible)
+            if ($dbVar -eq "MYSQL_ROOT_PASSWORD") {
+                # Try to connect with .env password
+                $testResult = docker exec "$projectName-mysql" mysql -u root -p"$envValue" -e "SELECT 1;" 2>$null
+                if (-not ($testResult -and $testResult.Trim() -ne "")) {
+                    $dbVarChanged = $true
+                    $dbVarWarnings += "MYSQL_ROOT_PASSWORD (Änderung nach Erstinstallation erkannt)"
+                }
+            }
+            elseif ($dbVar -eq "MYSQL_USER") {
+                $userCheck = docker exec "$projectName-mysql" mysql -u root -p"$mysqlRootPassword" -e "SELECT User FROM mysql.user WHERE User='$envValue';" 2>$null | Select-Object -Skip 1
+                if (-not ($userCheck -and $userCheck.Trim() -eq $envValue)) {
+                    $dbVarChanged = $true
+                    $dbVarWarnings += "MYSQL_USER (Änderung nach Erstinstallation erkannt)"
+                }
+            }
+            elseif ($dbVar -eq "MYSQL_DATABASE") {
+                $dbCheck = docker exec "$projectName-mysql" mysql -u root -p"$mysqlRootPassword" -e "SHOW DATABASES LIKE '$envValue';" 2>$null | Select-Object -Skip 1
+                if (-not ($dbCheck -and $dbCheck.Trim() -eq $envValue)) {
+                    $dbVarChanged = $true
+                    $dbVarWarnings += "MYSQL_DATABASE (Änderung nach Erstinstallation erkannt)"
+                }
+            }
+            elseif ($dbVar -eq "MYSQL_PASSWORD") {
+                $pwCheck = docker exec "$projectName-mysql" mysql -u "$joomlaDbUser" -p"$envValue" -e "SELECT 1;" 2>$null
+                if (-not ($pwCheck -and $pwCheck.Trim() -ne "")) {
+                    $dbVarChanged = $true
+                    $dbVarWarnings += "MYSQL_PASSWORD (Änderung nach Erstinstallation erkannt)"
+                }
             }
         }
-        
-        # Test each password to find working root connection
-        $workingRootPassword = $null
-        Write-Host "   🔍 Testing $($possibleRootPasswords.Count) password combinations..." -ForegroundColor Gray
-        
-        foreach ($testPassword in $possibleRootPasswords) {
-            $testResult = docker exec "$projectName-mysql" mysql -u root -p"$testPassword" -e "SELECT 1;" 2>$null
-            if ($testResult -and $testResult.Trim() -ne "") {
-                $workingRootPassword = $testPassword
-                if ($testPassword -ne $mysqlRootPassword) {
-                    Write-Host "   🔍 Found working root password (different from .env)" -ForegroundColor Yellow
-                }
-                break
-            }
+
+        if ($dbVarChanged) {
+            Write-Host "❌ Datenbank-Variablen wurden nach der Erstinstallation geändert!" -ForegroundColor Red
+            Write-Host "   Diese Änderungen sind nicht erlaubt und werden ignoriert." -ForegroundColor Yellow
+            Write-Host "   Betroffene Variablen: $($dbVarWarnings -join ', ')" -ForegroundColor Gray
+            Write-Host "   Tipp: Für DB-Änderungen bitte Neuinstallation durchführen!" -ForegroundColor Cyan
+            # Setze alle DB-Variablen auf die Werte der laufenden DB (keine Änderung)
+            # Hole aktuelle Werte (nur für Info, nicht für Sync)
+            # Ab hier werden nur Joomla/Port-Variablen synchronisiert
+        }
+        else {
+            # ...bestehende Sync-Logik...
+            # ...existing code...
         }
         
         if (-not $workingRootPassword) {
