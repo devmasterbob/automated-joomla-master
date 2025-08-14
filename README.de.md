@@ -101,24 +101,12 @@ JOOMLA_ADMIN_PASSWORD=admin12345678
 ```
 
 **⚠️ WICHTIG:** Alle Passwörter müssen **mindestens 12 Zeichen** lang sein, sonst schlägt die automatische Installation fehl!
-
-# Optional anpassen:
-JOOMLA_ADMIN_EMAIL=admin@meinedomain.com
-JOOMLA_SITE_NAME=Mein Joomla Projekt
 ```
+### ⚠️ Datenbank-Einstellungen nach Erstinstallation
 
-### 4. System starten
-```powershell
-# Im VS Code Terminal:
-.\start-project.ps1
-```
+Nach der Erstinstallation sind alle Datenbank-Variablen (`MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD`, `MYSQL_USER`, `MYSQL_DATABASE`) gesperrt und können nicht mehr über die `.env` geändert werden. Änderungen werden ignoriert und eine Warnung ausgegeben. Nur Joomla-Einstellungen (Admin-Passwort, Site Name, Admin Email) und Ports können sicher geändert werden.
 
-### 5. ⏱️ **WICHTIG: Warten Sie 2-3 Minuten!**
-> **🚨 Das System braucht Zeit für die automatische Installation!**
-> 
-> **Was passiert im Hintergrund:**
-> - Joomla wird heruntergeladen
-> - Datenbank wird automatisch eingerichtet
+Wenn Sie Datenbank-Einstellungen ändern möchten, führen Sie eine Neuinstallation durch (Datenbank-Volume entfernen und Projekt neu starten).
 > - Joomla wird vollständig installiert
 > - Installation-Verzeichnis wird automatisch entfernt
 > 

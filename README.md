@@ -1,3 +1,10 @@
+# Optional customization:
+
+### ⚠️ Database Settings After First Installation
+
+After the initial setup, all database-related variables (`MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD`, `MYSQL_USER`, `MYSQL_DATABASE`) are locked and cannot be changed via `.env`. Any changes to these variables will be ignored and a warning will be shown. Only Joomla settings (admin password, site name, admin email) and ports can be changed safely.
+
+If you need to change database settings, you must perform a fresh installation (remove the database volume and restart the project).
 # 🚀 Automated Joomla Master
 
 > **🌍 [Deutsch](README.de.md) | English | [Add your language](https://github.com/devmasterbob/automated-joomla-master/issues)**
