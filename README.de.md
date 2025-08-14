@@ -21,7 +21,14 @@ cd my-joomla-project
 .\start-project.ps1          # Starts all containers
 # Wait 2-3 minutes ⏰ 
 # Open: http://localhost:81 🎉
+
 ```
+
+### ⚠️ Datenbank-Einstellungen nach Erstinstallation
+
+Nach der Erstinstallation sind alle Datenbank-Variablen (`MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD`, `MYSQL_USER`, `MYSQL_DATABASE`) gesperrt und können nicht mehr über die `.env` geändert werden. Änderungen werden ignoriert und eine Warnung ausgegeben. Nur Joomla-Einstellungen (Admin-Passwort, Site Name, Admin Email) und Ports können sicher geändert werden.
+
+Wenn Sie Datenbank-Einstellungen ändern möchten, führen Sie eine Neuinstallation durch (Datenbank-Volume entfernen und Projekt neu starten).
 
 ## ⭐ **Warum Automated Joomla Master wählen?**
 
