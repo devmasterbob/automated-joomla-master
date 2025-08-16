@@ -63,3 +63,24 @@ else {
     Write-Host "[TIP] You can run: .\start-project.ps1" -ForegroundColor Magenta
     Write-Host ""
 }
+
+
+# Check for port conflicts before finishing
+if (Test-Path ".env") {
+    Write-Host "[CHECK] Checking for port conflicts..." -ForegroundColor Cyan
+    $envContent = Get-Content ".env" | Where-Object { $_ -match "=" }
+    $ports = @{}
+    foreach ($line in $envContent) {
+        if ($line -match "^PORT_(\w+)=(\d+)$") {
+            $ports[$Matches[1]] = [int]$Matches[2]
+        }
+    }
+    foreach ($portName in $ports.Keys) {
+        $port = $ports[$portName]
+        $tcpUsed = (Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue)
+        if ($tcpUsed) {
+            Write-Host "⚠️  Port $port ($portName) ist bereits belegt! Bitte einen freien Port in der .env wählen." -ForegroundColor Yellow
+        }
+    }
+    Write-Host ""
+}
