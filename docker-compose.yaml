@@ -42,7 +42,7 @@ services:
       - db
 
   db:
-    image: mysql:8.0
+    image: "${MYSQL_IMAGE:-mysql:8.0}"
     container_name: ${PROJECT_NAME}-mysql
     restart: always
     ports:
@@ -51,12 +51,12 @@ services:
       - .env
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - db_data:/var/lib/mysql
+      - ${PROJECT_NAME}_db_data:/var/lib/mysql
     networks:
       - joomla_network
 
   phpmyadmin:
-    image: phpmyadmin:latest
+    image: "${PHPMYADMIN_IMAGE:-phpmyadmin:latest}"
     container_name: ${PROJECT_NAME}-phpmyadmin
     restart: always
     depends_on:
@@ -69,7 +69,7 @@ services:
       - joomla_network
 
 volumes:
-  db_data:
+  ${PROJECT_NAME}_db_data:
 
 
 networks:
