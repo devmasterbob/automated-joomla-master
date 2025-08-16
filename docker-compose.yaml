@@ -51,7 +51,7 @@ services:
       - .env
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - ${PROJECT_NAME}_db_data:/var/lib/mysql
+      - db_data:/var/lib/mysql
     networks:
       - joomla_network
 
@@ -69,7 +69,7 @@ services:
       - joomla_network
 
 volumes:
-  ${PROJECT_NAME}_db_data:
+  db_data:
 
 
 networks:
