@@ -109,11 +109,11 @@ $hostIp = getenv('LANDING_HOST_IP') ?: 'localhost';
     <ul>
         <li><a href="test.php" target="_blank" rel="noopener noreferrer">PHP Info</a></li>
         <li><a href="db-test.php" target="_blank" rel="noopener noreferrer">Datenbank Test</a></li>
-        <?php
-            <li><a href="http://<?php echo $hostIp . ':' . $portJoomla; ?>" target="_blank" rel="noopener noreferrer">Joomla Frontside</a></li>
-            <li><a href="http://<?php echo $hostIp . ':' . $portJoomla; ?>/administrator" target="_blank" rel="noopener noreferrer">Joomla Administration</a></li>
-            <li><a href="http://<?php echo $hostIp . ':' . $portPhpMyAdmin; ?>" target="_blank" rel="noopener noreferrer">PHPMyAdmin</a></li>
-        ?>       
+        
+        <li><a href="http://<?php echo $hostIp . ':' . $portJoomla; ?>" target="_blank" rel="noopener noreferrer">Joomla Frontside</a></li>
+        <li><a href="http://<?php echo $hostIp . ':' . $portJoomla; ?>/administrator" target="_blank" rel="noopener noreferrer">Joomla Administration</a></li>
+        <li><a href="http://<?php echo $hostIp . ':' . $portPhpMyAdmin; ?>" target="_blank" rel="noopener noreferrer">PHPMyAdmin</a></li>
+               
     </ul>
     <p>
     <ul>
