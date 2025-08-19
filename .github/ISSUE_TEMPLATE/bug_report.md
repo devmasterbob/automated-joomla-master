@@ -32,5 +32,5 @@ Add any other context about the problem here.
 ## 🔧 Docker Logs
 If applicable, add output from:
 ```bash
-docker-compose logs
+docker compose logs
 ```

@@ -154,7 +154,7 @@ Das System installiert Joomla und richtet die Datenbank automatisch ein.
 
 ```
 .
-├── docker-compose.yaml    # Hauptkonfiguration
+├── docker compose.yaml    # Hauptkonfiguration
 ├── .env-example          # Vorlage für Konfiguration
 ├── .env                  # Ihre lokalen Einstellungen (wird erstellt)
 ├── README.md             # Diese Anleitung
@@ -181,13 +181,13 @@ Das System installiert Joomla und richtet die Datenbank automatisch ein.
 .\start-project.ps1
 
 # Stoppen
-docker-compose down
+docker compose down
 
 # Logs anzeigen
-docker-compose logs -f
+docker compose logs -f
 
 # Neustart nach Änderungen
-docker-compose down && docker-compose up -d
+docker compose down && docker compose up -d
 ```
 
 ### Dateien bearbeiten
@@ -215,7 +215,7 @@ Alle Joomla-Dateien befinden sich im `joomla/` Ordner und können direkt bearbei
 #### 1. 📋 Vorbereitung
 ```bash
 # Stelle sicher, dass Container laufen:
-docker-compose ps
+docker compose ps
 
 # Exportiere die Datenbank:
 .\export-database.ps1
@@ -301,7 +301,7 @@ git push -u origin main
 
 ### 💾 **Was wird versioniert:**
 - ✅ **Joomla-Dateien** (`joomla/` Ordner) 
-- ✅ **Docker-Konfiguration** (docker-compose.yaml, Dockerfile)
+- ✅ **Docker-Konfiguration** (docker compose.yaml, Dockerfile)
 - ✅ **Scripts** (prepare.ps1, start-project.ps1, export-database.ps1)
 - ❌ **Datenbank-Inhalte** (für Backups: `.\export-database.ps1` verwenden)
 - ❌ **.env Datei** (aus Sicherheitsgründen)
@@ -333,13 +333,13 @@ curl -o joomla.tar.zst -SL https://github.com/joomla/joomla-cms/releases/downloa
 ## 🐛 Troubleshooting
 
 ### ⏱️ "Joomla lädt nicht" / "Seite nicht verfügbar"
-**LÖSUNG:** Warten Sie 2-3 Minuten nach `docker-compose up -d`!
+**LÖSUNG:** Warten Sie 2-3 Minuten nach `docker compose up -d`!
 ```bash
 # Status der Container prüfen:
-docker-compose ps
+docker compose ps
 
 # Installation verfolgen:
-docker-compose logs -f joomla
+docker compose logs -f joomla
 
 # Warten bis Sie sehen: "Complete! Joomla has been successfully copied"
 ```
@@ -352,31 +352,31 @@ netstat -an | grep :81
 netstat -an | grep :82
 
 # Container-Status prüfen
-docker-compose ps
-docker-compose logs
+docker compose ps
+docker compose logs
 ```
 
 ### Joomla zeigt Fehler
 ```bash
 # Container-Logs prüfen
-docker-compose logs joomla
+docker compose logs joomla
 
 # In Container einsteigen
-docker-compose exec joomla bash
+docker compose exec joomla bash
 ```
 
 ### Datenbank-Verbindungsfehler
 ```bash
 # MySQL-Container prüfen
-docker-compose logs db
+docker compose logs db
 
 # Datenbank-Verbindung testen
-docker-compose exec joomla mysql -h db -u joomla -p
+docker compose exec joomla mysql -h db -u joomla -p
 ```
 
 ### Browser zeigt 404
 - Browser-Cache leeren (Strg+F5)
-- Container neu starten: `docker-compose restart`
+- Container neu starten: `docker compose restart`
 
 ## 📋 Systemanforderungen
 
@@ -435,7 +435,7 @@ Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE
 
 **Made with ❤️ für die Joomla-Community** | **Star ⭐ wenn dieses Projekt Ihnen geholfen hat!**
 2. GitHub Issues verwenden
-3. Logs immer mit anhängen: `docker-compose logs`
+3. Logs immer mit anhängen: `docker compose logs`
 
 ## 🎉 Credits
 
@@ -445,3 +445,13 @@ Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die [LICENSE](LICENSE
 
 ---
 **Entwickelt für maximale Automatisierung und Entwicklerfreundlichkeit** 🚀
+
+> **Wichtig:**  
+> Verwenden Sie immer `docker compose` (ohne Bindestrich) für alle Befehle und Skripte.  
+> Das alte `docker compose` ist veraltet und unterstützt keine Docker Desktop-Kontexte oder moderne Features.  
+>  
+> Beispiel:  
+> ```bash
+> docker compose up -d --remove-orphans
+> docker compose down -v --remove-orphans
+> ```

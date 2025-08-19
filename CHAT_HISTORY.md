@@ -130,7 +130,7 @@ cp .env-example .env
 # .env bearbeiten: PROJECT_NAME + Passwörter ändern
 
 # 4. System starten & 2-3 Minuten warten
-docker-compose up -d
+docker compose up -d
 
 # 5. Zugriff:
 # - Projekt-Info: http://localhost:81

@@ -133,7 +133,7 @@ if ($volumeExists) {
     
     # Start containers first to access database
     Write-Host "🔄 Starting containers to check database..." -ForegroundColor Cyan
-    docker-compose up -d --quiet-pull
+    docker compose up -d --quiet-pull
     
     # Wait for database to be ready
     Write-Host "⏳ Waiting for database to start..." -ForegroundColor Gray
@@ -143,7 +143,7 @@ if ($volumeExists) {
     $hasJoomlaData = $false
     try {
         # Try to connect and check for Joomla tables
-        $dbCheck = docker-compose exec -T db mysql -u root -p"$($envVariables['MYSQL_ROOT_PASSWORD'])" -e "USE $($envVariables['MYSQL_DATABASE']); SHOW TABLES LIKE 'joom_%';" 2>$null
+        $dbCheck = docker compose exec -T db mysql -u root -p"$($envVariables['MYSQL_ROOT_PASSWORD'])" -e "USE $($envVariables['MYSQL_DATABASE']); SHOW TABLES LIKE 'joom_%';" 2>$null
         if ($dbCheck -and $dbCheck.Trim() -ne "") {
             $hasJoomlaData = $true
         }
@@ -163,7 +163,7 @@ if ($volumeExists) {
             $updateRootPassword = "ALTER USER 'root'@'%' IDENTIFIED BY '$($envVariables['MYSQL_ROOT_PASSWORD'])';"
             
             # Update the passwords
-            docker-compose exec -T db mysql -u root -p"$($envVariables['MYSQL_ROOT_PASSWORD'])" -e "$updatePassword $updateRootPassword FLUSH PRIVILEGES;" 2>$null
+            docker compose exec -T db mysql -u root -p"$($envVariables['MYSQL_ROOT_PASSWORD'])" -e "$updatePassword $updateRootPassword FLUSH PRIVILEGES;" 2>$null
             Write-Host "✅ Database passwords synchronized with .env file" -ForegroundColor Green
         }
         catch {
@@ -182,11 +182,11 @@ else {
 if (-not $volumeExists) {
     Write-Host "🔄 Starting Docker containers..." -ForegroundColor Cyan
     Write-Host "   Project Name: $projectName" -ForegroundColor Gray
-    docker-compose up -d
+    docker compose up -d
 }
 else {
     Write-Host "🔄 Ensuring all containers are running..." -ForegroundColor Cyan
-    docker-compose up -d --quiet-pull
+    docker compose up -d --quiet-pull
 }
 
 if ($LASTEXITCODE -eq 0) {
@@ -499,7 +499,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "⚠️  IMPORTANT: If you get 'Error 500' on first visit:" -ForegroundColor Yellow
     Write-Host "   • Wait 30 seconds more for full installation" -ForegroundColor Yellow  
     Write-Host "   • Clear browser cache (Ctrl+F5)" -ForegroundColor Yellow
-    Write-Host "   • Or run: docker-compose down -v --remove-orphans && .\start-project.ps1" -ForegroundColor Yellow
+    Write-Host "   • Or run: docker compose down -v --remove-orphans && .\start-project.ps1" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "🔐 Default Login Credentials:" -ForegroundColor White
     Write-Host "   Joomla Admin:  admin / (see .env file)" -ForegroundColor Green
@@ -538,5 +538,5 @@ if ($LASTEXITCODE -eq 0) {
 else {
     Write-Host ""
     Write-Host "❌ Container startup failed!" -ForegroundColor Red
-    Write-Host "💡 Please check: docker-compose logs" -ForegroundColor Yellow
+    Write-Host "💡 Please check: docker compose logs" -ForegroundColor Yellow
 }

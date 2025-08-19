@@ -140,7 +140,7 @@ JOOMLA_SITE_NAME=Your Project Name
 #### 4. Start System (Option B - Standard)
 ```bash
 # In VS Code Terminal:
-docker-compose up -d
+docker compose up -d
 ```
 
 #### 5. ⏱️ **IMPORTANT: Wait 2-3 minutes!**
@@ -157,7 +157,7 @@ docker-compose up -d
 > **Check status:**
 > ```bash
 > # Follow container logs (optional):
-> docker-compose logs -f joomla
+> docker compose logs -f joomla
 > ```
 
 #### 6. ✅ Ready!
@@ -212,7 +212,7 @@ git push -u origin main
 
 ### 💾 **What gets versioned:**
 - ✅ **Joomla files** (`joomla/` folder) 
-- ✅ **Docker configuration** (docker-compose.yaml, scripts)
+- ✅ **Docker configuration** (docker compose.yaml, scripts)
 - ❌ **Database content** (use `.\export-database.ps1` for backups)
 - ❌ **.env file** (security best practice - `.env-example` as template)
 
@@ -243,7 +243,7 @@ Use the included PowerShell script for automated export:
 .\export-database.ps1
 
 # Manual export (Linux/macOS)
-docker-compose exec db mysqldump -u root -p joomla_db > backup.sql
+docker compose exec db mysqldump -u root -p joomla_db > backup.sql
 ```
 
 ### Files to Upload to Provider
@@ -277,7 +277,7 @@ public $db = 'your-provider-db-name';
 # Safe: A-Z a-z 0-9 - _ . + * # @ % & ( ) = ? !
 
 # Step 2: Complete cleanup and restart
-docker-compose down -v --remove-orphans
+docker compose down -v --remove-orphans
 .\start-project.ps1
 ```
 
@@ -296,27 +296,27 @@ docker stop $(docker ps -q)  # Stop all containers
 ### Container Won't Start
 ```bash
 # Check container status
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs joomla
+docker compose logs joomla
 
 # Restart containers
-docker-compose restart
+docker compose restart
 ```
 
 ### Joomla Shows 404 Error
 - Clear browser cache (`Ctrl+F5`)
 - Wait 2-3 minutes for installation to complete
-- Check if containers are running: `docker-compose ps`
+- Check if containers are running: `docker compose ps`
 
 ### Database Connection Issues
 ```bash
 # Test database connection
-docker-compose exec joomla mysql -h db -u joomla -p
+docker compose exec joomla mysql -h db -u joomla -p
 
 # Restart database container
-docker-compose restart db
+docker compose restart db
 ```
 
 ### Browser Shows "Site Offline"
