@@ -14,7 +14,8 @@ $joomlaDbHost = getenv('JOOMLA_DB_HOST');
 $portJoomla = getenv('PORT_JOOMLA') ?: '80';
 $portPhpMyAdmin = getenv('PORT_PHPMYADMIN') ?: '8082';
 
-$hostIp = getenv('HOST_IP') ?: 'localhost';
+$hostIp = getenv('LANDING_HOST_IP') ?: 'localhost';
+?>
 
 <!DOCTYPE html>
 <html lang="de">
