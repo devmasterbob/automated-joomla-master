@@ -7,3 +7,4 @@ joomladb.sql
 joomla/configuration.php
 joomla/
 _secrets/
+db_data/

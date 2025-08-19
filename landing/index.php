@@ -14,11 +14,8 @@ $joomlaDbHost = getenv('JOOMLA_DB_HOST');
 $portJoomla = getenv('PORT_JOOMLA') ?: '80';
 $portPhpMyAdmin = getenv('PORT_PHPMYADMIN') ?: '8082';
 
+$hostIp = getenv('HOST_IP') ?: 'localhost';
 
-
-
-
-?>
 <!DOCTYPE html>
 <html lang="de">
 
@@ -111,9 +108,11 @@ $portPhpMyAdmin = getenv('PORT_PHPMYADMIN') ?: '8082';
     <ul>
         <li><a href="test.php" target="_blank" rel="noopener noreferrer">PHP Info</a></li>
         <li><a href="db-test.php" target="_blank" rel="noopener noreferrer">Datenbank Test</a></li>
-        <li><a href="http://localhost:<?php echo $portJoomla; ?>" target="_blank" rel="noopener noreferrer">Joomla Frontside</a></li>
-        <li><a href="http://localhost:<?php echo $portJoomla; ?>/administrator" target="_blank" rel="noopener noreferrer">Joomla Administration</a></li>
-        <li><a href="http://localhost:<?php echo $portPhpMyAdmin; ?>" target="_blank" rel="noopener noreferrer">PHPMyAdmin</a></li>
+        <?php
+            <li><a href="http://<?php echo $hostIp . ':' . $portJoomla; ?>" target="_blank" rel="noopener noreferrer">Joomla Frontside</a></li>
+            <li><a href="http://<?php echo $hostIp . ':' . $portJoomla; ?>/administrator" target="_blank" rel="noopener noreferrer">Joomla Administration</a></li>
+            <li><a href="http://<?php echo $hostIp . ':' . $portPhpMyAdmin; ?>" target="_blank" rel="noopener noreferrer">PHPMyAdmin</a></li>
+        ?>       
     </ul>
     <p>
     <ul>
