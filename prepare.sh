@@ -32,10 +32,16 @@ fi
 # Check for port conflicts before finishing
 if [ -f ".env" ]; then
     echo "[CHECK] Checking for port conflicts..."
-    grep -E "^PORT_[A-Z]+=[0-9]+$" .env | while IFS='=' read -r key port; do
-        if ss -tuln | grep -q ":$port "; then
-            echo "⚠️  Port $port ($key) is already in use! Please choose a free port in .env."
-        fi
-    done
+    if ! command -v ss &> /dev/null; then
+        echo "⚠️  'ss' command not found! Port check skipped."
+    else
+        grep -E "^PORT_[A-Z]+=[0-9]+$" .env | while IFS='=' read -r key port; do
+            if ss -tuln | grep -q ":$port "; then
+                echo "⚠️  Port $port ($key) is already in use! Please choose a free port in .env."
+            fi
+        done
+    fi
     echo ""
 fi
+
+echo "[DONE] Preparation finished!"
