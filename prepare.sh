@@ -2,6 +2,13 @@
 
 echo "🚀 Prepare Automated Joomla Master Project"
 
+# Set PROJECT_NAME and COMPOSE_PROJECT_NAME in .env
+current_folder=$(basename "$PWD")
+if [ -f ".env" ]; then
+    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$current_folder/" .env
+    sed -i "s/^COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=$current_folder/" .env
+fi
+
 # Create .env from template if it doesn't exist
 if [ ! -f ".env" ]; then
     echo "[CREATE] Creating .env from .env-example..."
@@ -31,14 +38,10 @@ fi
 # Check for port conflicts before finishing
 if [ -f ".env" ]; then
     echo "[CHECK] Checking for port conflicts..."
-    while IFS= read -r line; do
-        if [[ $line =~ ^PORT_([A-Z]+)=(.*)$ ]]; then
-            portName="${BASH_REMATCH[1]}"
-            port="${BASH_REMATCH[2]}"
-            if ss -tuln | grep -q ":$port "; then
-                echo "⚠️  Port $port ($portName) is already in use! Please choose a free port in .env."
-            fi
+    grep -E "^PORT_[A-Z]+=[0-9]+$" .env | while IFS='=' read -r key port; do
+        if ss -tuln | grep -q ":$port "; then
+            echo "⚠️  Port $port ($key) is already in use! Please choose a free port in .env."
         fi
-    done < .env
+    done
     echo ""
 fi
