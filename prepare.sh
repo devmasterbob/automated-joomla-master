@@ -15,22 +15,16 @@ if [ ! -f ".env" ]; then
     cp .env-example .env
     echo "[SUCCESS] Created .env file"
     echo ""
-    echo "================================================================="
-    echo "[IMPORTANT] Please customize your passwords!"
-    echo "================================================================="
-    echo ""
-    echo "[EDIT] Edit the .env file and change these passwords:"
-    echo "   * JOOMLA_ADMIN_PASSWORD (minimum 12 characters)"
-    echo "   * JOOMLA_DB_PASSWORD (minimum 12 characters)"
-    echo "   * MYSQL_ROOT_PASSWORD (minimum 12 characters)"
-    echo ""
-    echo "[WARNING] Avoid problematic characters: dollar-sign, backtick, quotes, backslash, section-sign"
-    echo "[OK] Good characters: A-Z a-z 0-9 - _ . + * # @ % & ( ) = ? !"
-    echo ""
-    echo "[TIP] After editing .env, run: ./start-project.sh"
-    echo "================================================================="
+    # Set PROJECT_NAME and COMPOSE_PROJECT_NAME in .env (directly after creation)
+    current_folder=$(basename "$PWD")
+    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$current_folder/" .env
+    sed -i "s/^COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=$current_folder/" .env
+    # ...existing code...
 else
     echo "[INFO] .env file already exists"
+    current_folder=$(basename "$PWD")
+    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$current_folder/" .env
+    sed -i "s/^COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=$current_folder/" .env
     echo "[TIP] You can run: ./start-project.sh"
     echo ""
 fi
