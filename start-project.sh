@@ -12,8 +12,10 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Load environment variables
-export $(grep -v '^#' .env | xargs)
+# Load environment variables with variable expansion
+set -a
+source .env
+set +a
 
 projectName="${PROJECT_NAME}"
 portLanding="${PORT_LANDING}"
