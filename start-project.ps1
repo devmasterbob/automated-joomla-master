@@ -105,10 +105,14 @@ foreach ($passwordVar in $passwordVars) {
         # Check password length (minimum 12 characters for Joomla)
         if ($passwordValue.Length -lt 12) {
             Write-Host "❌ Password too short in $passwordVar! Found: $($passwordValue.Length) characters" -ForegroundColor Red
-            Write-Host "💡 Joomla requires passwords with at least 12 characters" -ForegroundColor Yellow
+            Write-Host "💡 Joomla recommends passwords with at least 12 characters" -ForegroundColor Yellow
             Write-Host "   Current: '$passwordValue' ($($passwordValue.Length) chars)" -ForegroundColor Red
             Write-Host "   Example: 'admin12345678' (12+ chars)" -ForegroundColor Cyan
-            exit 1
+            $continue = Read-Host "Do you want to continue anyway? (y/N)"
+            if ($continue -ne "y" -and $continue -ne "Y") {
+                Write-Host "Aborted by user due to short password." -ForegroundColor Red
+                exit 1
+            }
         }
         
         foreach ($char in $problematicChars) {
