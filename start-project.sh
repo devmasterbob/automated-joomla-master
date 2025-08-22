@@ -57,6 +57,18 @@ for passwordVar in "${passwordVars[@]}"; do
     fi
 done
 
+# --- Auto-Cleanup .git and .github ---
+if [ -d ".git" ]; then
+    echo "🧹 Removing .git directory for a clean project..."
+    rm -rf .git
+    echo "✅ .git directory removed."
+fi
+if [ -d ".github" ]; then
+    echo "🧹 Removing .github directory for a clean project..."
+    rm -rf .github
+    echo "✅ .github directory removed."
+fi
+
 volumeName="${projectName}_db_data"
 volumeExists=$(docker volume ls -q -f name="$volumeName")
 
