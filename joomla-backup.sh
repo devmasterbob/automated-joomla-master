@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 echo "🗄️  Creating database backup..."
 
 # Load .env file
@@ -24,7 +27,10 @@ fi
 
 date=$(date +"%Y-%m-%d_%H-%M-%S")
 backupFile="${projectName}_${dbName}_backup_${date}.sql"
-backupFullPath="${backupTarget}/${backupFile}"
+backupDir="${backupTarget}/${projectName}/${date}"
+backupFullPath="${backupTarget}/${projectName}/${date}/${backupFile}"
+
+mkdir -p "${backupDir}"
 
 echo "📋 Backup Details:"
 echo "   Project: $projectName"
@@ -67,3 +73,13 @@ else
     echo "❌ Fehler beim Erstellen des Backups!"
     exit 1
 fi
+
+# ############################################ JOOMLA-Verzeichnis ############################################
+
+# 2. Joomla-Verzeichnis sichern
+echo " "
+echo "🔄 Backup Joomla Directory..."
+tar -czf "$backupDir/${projectName}_joomla_files_${date}.tar.gz" \
+    -C ./joomla .
+
+echo "✅ Vollständiges Backup erstellt in: $backupDir"
