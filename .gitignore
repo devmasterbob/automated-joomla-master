@@ -8,3 +8,4 @@ joomla/configuration.php
 joomla/
 _secrets/
 db_data/
+backup/
