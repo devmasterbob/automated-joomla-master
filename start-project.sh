@@ -69,6 +69,49 @@ if [ -d ".github" ]; then
     echo "✅ .github directory removed."
 fi
 
+# --- Erweiterte Konfigurations-Synchronisation (Site Name, Admin Email, Port) ---
+joomlaConfig="./joomla/configuration.php"
+syncNeeded=false
+
+if [ -f "$joomlaConfig" ]; then
+    # Site Name
+    currentSiteName=$(grep -E "public \$sitename\s*=" "$joomlaConfig" | sed "s/.*='\(.*\)';/\1/")
+    if [ "$currentSiteName" != "$JOOMLA_SITE_NAME" ]; then
+        sed -i "s/public \$sitename = '.*';/public \$sitename = '$JOOMLA_SITE_NAME';/" "$joomlaConfig"
+        echo "🔄 Synchronized Site Name in configuration.php: $JOOMLA_SITE_NAME"
+        syncNeeded=true
+    fi
+    # Admin Email
+    currentAdminEmail=$(grep -E "public \$mailfrom\s*=" "$joomlaConfig" | sed "s/.*='\(.*\)';/\1/")
+    if [ "$currentAdminEmail" != "$JOOMLA_ADMIN_EMAIL" ]; then
+        sed -i "s/public \$mailfrom = '.*';/public \$mailfrom = '$JOOMLA_ADMIN_EMAIL';/" "$joomlaConfig"
+        echo "🔄 Synchronized Admin Email in configuration.php: $JOOMLA_ADMIN_EMAIL"
+        syncNeeded=true
+    fi
+    # Port (optional, falls in config vorhanden)
+    if grep -q "public \$live_site" "$joomlaConfig"; then
+        sed -i "s/public \$live_site = '.*';/public \$live_site = 'http:\/\/localhost:$PORT_JOOMLA';/" "$joomlaConfig"
+        echo "🔄 Synchronized live_site URL in configuration.php: http://localhost:$PORT_JOOMLA"
+        syncNeeded=true
+    fi
+fi
+
+if [ "$syncNeeded" = true ]; then
+    echo "✅ configuration.php updated with latest settings from .env"
+fi
+
+# Optional: Synchronisiere Site Name und Admin Email auch in der Datenbank (wenn Joomla läuft)
+joomlaContainerName="${projectName}-joomla"
+if docker compose ps | grep -q "$joomlaContainerName"; then
+    # Site Name
+    docker compose exec -T db mysql -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" \
+        -e "UPDATE \`joom_config\` SET \`value\` = '$JOOMLA_SITE_NAME' WHERE \`name\` = 'sitename';" 2>/dev/null
+    # Admin Email
+    docker compose exec -T db mysql -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" \
+        -e "UPDATE \`joom_config\` SET \`value\` = '$JOOMLA_ADMIN_EMAIL' WHERE \`name\` = 'mailfrom';" 2>/dev/null
+    echo "✅ Joomla database settings synchronized (Site Name, Admin Email)"
+fi
+
 volumeName="${projectName}_db_data"
 volumeExists=$(docker volume ls -q -f name="$volumeName")
 
