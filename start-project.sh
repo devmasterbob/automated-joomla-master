@@ -115,6 +115,11 @@ fi
 volumeName="${projectName}_db_data"
 volumeExists=$(docker volume ls -q -f name="$volumeName")
 
+# --- Recovery- und Fallback-Logik für Datenbank-Variablen ---
+dbVars=("MYSQL_ROOT_PASSWORD" "MYSQL_PASSWORD" "MYSQL_USER" "MYSQL_DATABASE")
+dbVarChanged=false
+dbVarWarnings=()
+
 if [ -n "$volumeExists" ]; then
     echo "🔍 Existing database volume detected"
     echo "   Volume: $volumeName"
@@ -123,6 +128,47 @@ if [ -n "$volumeExists" ]; then
     docker compose up -d --quiet-pull
     echo "⏳ Waiting for database to start..."
     sleep 10
+
+    # Prüfe, ob DB-Variablen geändert wurden
+    for dbVar in "${dbVars[@]}"; do
+        envValue="${!dbVar}"
+        # Teste Verbindung mit aktuellen Variablen
+        if [ "$dbVar" == "MYSQL_ROOT_PASSWORD" ]; then
+            docker compose exec -T db mysql -u root -p"$envValue" -e "SELECT 1;" 2>/dev/null
+            if [ $? -ne 0 ]; then
+                dbVarChanged=true
+                dbVarWarnings+=("$dbVar (changed after initial installation)")
+            fi
+        elif [ "$dbVar" == "MYSQL_USER" ]; then
+            userCheck=$(docker compose exec -T db mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT User FROM mysql.user WHERE User='$envValue';" 2>/dev/null | tail -n +2)
+            if [ "$userCheck" != "$envValue" ]; then
+                dbVarChanged=true
+                dbVarWarnings+=("$dbVar (changed after initial installation)")
+            fi
+        elif [ "$dbVar" == "MYSQL_DATABASE" ]; then
+            dbCheck=$(docker compose exec -T db mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SHOW DATABASES LIKE '$envValue';" 2>/dev/null | tail -n +2)
+            if [ "$dbCheck" != "$envValue" ]; then
+                dbVarChanged=true
+                dbVarWarnings+=("$dbVar (changed after initial installation)")
+            fi
+        elif [ "$dbVar" == "MYSQL_PASSWORD" ]; then
+            docker compose exec -T db mysql -u "$MYSQL_USER" -p"$envValue" -e "SELECT 1;" 2>/dev/null
+            if [ $? -ne 0 ]; then
+                dbVarChanged=true
+                dbVarWarnings+=("$dbVar (changed after initial installation)")
+            fi
+        fi
+    done
+
+    if [ "$dbVarChanged" = true ]; then
+        echo "❌ Database variables have been changed after initial installation!"
+        echo "   These changes are not allowed and will be ignored."
+        echo "   Affected variables: ${dbVarWarnings[*]}"
+        echo "   Tip: For DB changes, please perform a fresh installation!"
+        echo "   The application will continue to use the original database credentials."
+        echo "   Only Joomla settings and ports will be synchronized."
+    fi
+
     # Check for Joomla tables
     hasJoomlaData=false
     dbCheck=$(docker compose exec -T db mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "USE $MYSQL_DATABASE; SHOW TABLES LIKE 'joom_%';" 2>/dev/null)
