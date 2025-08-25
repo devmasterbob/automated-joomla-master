@@ -21,7 +21,6 @@ services:
     image: "${JOOMLA_IMAGE:-joomla:5-php8.3-apache}"
     container_name: ${PROJECT_NAME}-joomla
     restart: always
-    user: "33:33"
     ports:
       - ${PORT_JOOMLA}:80
     env_file:
