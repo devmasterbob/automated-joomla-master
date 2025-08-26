@@ -36,6 +36,7 @@ services:
       - JOOMLA_SITE_NAME=${JOOMLA_SITE_NAME}
     volumes:
       - ./joomla:/var/www/html
+      - ./php.ini:/usr/local/etc/php/php.ini
     networks:
       - joomla_network
     depends_on:
