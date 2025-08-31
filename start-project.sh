@@ -57,17 +57,6 @@ for passwordVar in "${passwordVars[@]}"; do
     fi
 done
 
-# --- Auto-Cleanup .git and .github ---
-if [ -d ".git" ]; then
-    echo "🧹 Removing .git directory for a clean project..."
-    rm -rf .git
-    echo "✅ .git directory removed."
-fi
-if [ -d ".github" ]; then
-    echo "🧹 Removing .github directory for a clean project..."
-    rm -rf .github
-    echo "✅ .github directory removed."
-fi
 
 # --- Erweiterte Konfigurations-Synchronisation (Site Name, Admin Email, Port) ---
 joomlaConfig="./joomla/configuration.php"
@@ -185,6 +174,19 @@ if [ -n "$volumeExists" ]; then
     fi
 else
     echo "🆕 Fresh installation detected - setting up new project..."
+
+    # --- Auto-Cleanup .git and .github ---
+    if [ -d ".git" ]; then
+        echo "🧹 Removing .git directory for a clean project..."
+        rm -rf .git
+        echo "✅ .git directory removed."
+    fi
+    if [ -d ".github" ]; then
+        echo "🧹 Removing .github directory for a clean project..."
+        rm -rf .github
+        echo "✅ .github directory removed."
+    fi
+
 fi
 
 # Start containers (if not already started for database check)
@@ -204,7 +206,8 @@ if [ $? -eq 0 ]; then
     echo "═══════════════════════════════════════════════════════════════"
     echo ""
 
-    # Check if Joomla is already installed by looking for configuration.php
+
+  # Check if Joomla is already installed by looking for configuration.php
     joomlaPath="./joomla"
     configExists=false
     isConfigured=false
@@ -240,6 +243,109 @@ if [ $? -eq 0 ]; then
         echo ""
         sleep 2
     fi
+
+        # ■■■ HIER DEN NEUEN CODE EINFÜGEN ■■■
+    # 🔧 PHP-Konfiguration und Berechtigungen
+    echo "🔧 Konfiguriere PHP-Einstellungen und Berechtigungen..."
+
+    # PHP temporäre Ordner-Einstellungen hinzufügen (falls nicht vorhanden)
+    phpIniFile="./php.ini"
+    customIniFile="./custom.ini"
+
+    if [ -f "$phpIniFile" ]; then
+        if ! grep -q "sys_temp_dir" "$phpIniFile"; then
+            echo "sys_temp_dir = \"/tmp\"" >> "$phpIniFile"
+            echo "upload_tmp_dir = \"/tmp\"" >> "$phpIniFile"
+            echo "✅ Temporäre Ordner-Einstellungen zu php.ini hinzugefügt"
+        fi
+    else
+        # Erstelle php.ini falls nicht vorhanden
+        cat > "$phpIniFile" << EOF
+        display_errors = Off
+        upload_max_filesize = 256M
+        post_max_size = 256M
+        memory_limit = 256M
+        max_execution_time = 300
+        max_input_vars = 3000
+        date.timezone = "UTC"
+        sys_temp_dir = "/tmp"
+        upload_tmp_dir = "/tmp"
+EOF
+        echo "✅ php.ini erstellt mit optimalen Einstellungen"
+    fi
+
+    # Custom.ini erstellen/aktualisieren für bessere Kompatibilität
+    cat > "$customIniFile" << EOF
+    ; Joomla-optimierte PHP-Einstellungen
+    display_errors = Off
+    upload_max_filesize = 256M
+    post_max_size = 256M
+    memory_limit = 256M
+    max_execution_time = 300
+    max_input_vars = 3000
+    date.timezone = "UTC"
+    sys_temp_dir = "/tmp"
+    upload_tmp_dir = "/tmp"
+EOF
+
+    echo "✅ custom.ini erstellt/aktualisiert"
+
+    # Docker-Compose für custom.ini erweitern (falls noch nicht vorhanden)
+    dockerComposeFile="./docker-compose.yaml"
+    if ! grep -q "custom.ini" "$dockerComposeFile"; then
+        # Backup erstellen
+        cp "$dockerComposeFile" "$dockerComposeFile.backup"
+        
+        # Custom.ini Mount hinzufügen
+        sed -i '/- \.\/php\.ini:\/usr\/local\/etc\/php\/php\.ini/a\    - ./custom.ini:/usr/local/etc/php/conf.d/zzz-custom.ini:ro' "$dockerComposeFile"
+        echo "✅ custom.ini Mount zu docker-compose.yaml hinzugefügt"
+        
+        # Container neu starten für neue Konfiguration
+        echo "🔄 Starte Container neu für PHP-Konfiguration..."
+        docker compose restart joomla
+    fi
+
+    # Warten bis Container wieder läuft
+    sleep 5
+
+    # Joomla-Ordnerstruktur und Berechtigungen konfigurieren
+    joomlaContainerName="${projectName}-joomla"
+    echo "🔧 Konfiguriere Joomla-Ordner und Berechtigungen..."
+
+    # Temporäre Ordner im Container erstellen
+    docker exec -u root "$joomlaContainerName" mkdir -p /var/www/html/tmp /var/www/html/logs /var/www/html/cache 2>/dev/null
+    docker exec -u root "$joomlaContainerName" chmod 777 /var/www/html/tmp /var/www/html/logs /var/www/html/cache 2>/dev/null
+
+    # Host-Berechtigungen setzen (falls die Ordner auf dem Host existieren)
+    if [ -d "./joomla/tmp" ]; then
+        sudo chown -R www-data:www-data ./joomla/tmp ./joomla/logs ./joomla/cache 2>/dev/null || true
+        sudo chmod -R 777 ./joomla/tmp ./joomla/logs ./joomla/cache 2>/dev/null || true
+    fi
+
+    # Allgemeine Joomla-Berechtigungen setzen
+    sudo chown -R $USER:$USER ./joomla 2>/dev/null || true
+    sudo chown -R www-data:www-data ./joomla 2>/dev/null || true
+    sudo chmod -R 755 ./joomla 2>/dev/null || true
+
+    echo "✅ Berechtigungen konfiguriert"
+
+    # PHP-Konfiguration überprüfen
+    echo "🔍 Überprüfe PHP-Konfiguration..."
+    uploadMax=$(docker exec "$joomlaContainerName" php -i | grep upload_max_filesize | head -1 | cut -d' ' -f3)
+    postMax=$(docker exec "$joomlaContainerName" php -i | grep post_max_size | head -1 | cut -d' ' -f3)
+
+    if [[ "$uploadMax" == "256M" ]] && [[ "$postMax" == "256M" ]]; then
+        echo "✅ PHP-Konfiguration erfolgreich: Upload ${uploadMax}, POST ${postMax}"
+    else
+        echo "⚠️  PHP-Konfiguration: Upload ${uploadMax}, POST ${postMax}"
+        echo "   Falls Werte nicht 256M sind, bitte Container neu starten"
+    fi
+
+    echo ""
+    # ■■■ ENDE DES NEUEN CODES ■■■
+
+
+  
 
     echo "📋 Your URLs are now available:"
     echo "   🏠 Project Info:  http://localhost:$portLanding"
